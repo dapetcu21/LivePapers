@@ -1,14 +1,16 @@
 #import "LPScreenView.h"
+#import "LPView.h"
 #include <dlfcn.h>
 
 @implementation LPScreenView
 
--(id)initWithMasterView:(UIView*)v
+-(id)initWithMasterView:(LPView*)v
 {
     if ((self = [super initWithFrame:[[UIScreen mainScreen] bounds]]))
     {
         master = v;
         [master retain];
+        [master addScreenView:self];
         [self setImage:nil];
     }
     return self;
@@ -16,6 +18,7 @@
 
 -(void)dealloc
 {
+    [master removeScreenView:self];
     [master release];
     [super dealloc];
 }
@@ -29,11 +32,6 @@
 
 -(void)setOrientation:(int)o duration:(float)dur
 {
-    if (dur)
-    {
-        [UIView beginAnimations:@"rotateWallpaper" context:nil];
-        [UIView setAnimationDuration: dur];
-    }
     CGRect f = [[UIScreen mainScreen] bounds];
     if (o>2)
     {
@@ -42,8 +40,6 @@
         f.size.height = a;
     }
     self.frame = f;
-    if (dur)
-        [UIView commitAnimations];
     orient = o;
 }
 
@@ -55,13 +51,7 @@
 
 -(void)didMoveToWindow
 {
-    CGRect rect = [master bounds];
-    UIGraphicsBeginImageContextWithOptions(rect.size,YES,0.0f);
-    CGContextRef context = UIGraphicsGetCurrentContext();
-    [master.layer renderInContext:context];   
-    UIImage *capturedImage = UIGraphicsGetImageFromCurrentImageContext();
-    UIGraphicsEndImageContext();
-    [super setImage:capturedImage];
+    [self setImage:[master image]];
 }
 
 -(CGRect)wallpaperContentsRect

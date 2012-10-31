@@ -1,6 +1,6 @@
 #include <UIKit/UIKit.h>
 
-@class LPWallpaper;
+@class LPWallpaper, LPScreenView;
 
 @interface LPView : UIView
 {
@@ -8,7 +8,10 @@
     LPWallpaper * paper;
     UIViewController * vc;
     UIImage * image;
+    UIImage * screen;
+    UIImageView * shotView;
     CGRect imageRect;
+    NSMutableSet * screenViews;
 }
 
 @property(nonatomic, assign) int orientation;
@@ -16,10 +19,16 @@
 @property(nonatomic, retain) LPWallpaper * wallpaper;
 @property(nonatomic, retain) UIViewController * viewController;
 
+-(UIImage*)screenshot;
+-(UIImage*)image;
 -(void)setOrientation:(int)o duration:(float)dur;
 -(void)setWallImage:(UIImage*)img;
 -(void)setWallRect:(CGRect)rect;
 
 -(id)initWithOrientation:(int)o variant:(int)v;
+
+-(void)addScreenView:(LPScreenView*)v;
+-(void)removeScreenView:(LPScreenView*)v;
+-(void)notifyScreenViews;
 
 @end

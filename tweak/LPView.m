@@ -1,4 +1,5 @@
 #import "LPView.h"
+#import "LPScreenView.h"
 #import "LPWallpaper.h"
 #import "LPController.h"
 
@@ -47,21 +48,55 @@ CGRect (*LPWallpaperContentsRectForAspectFill)(CGSize, CGRect);
     [self setWallImage: LPWallpaperImage(self.variant)];
     [self setWallRect: LPWallpaperContentsRectForAspectFill([image size], f)];
     orient = o;
+    [self notifyScreenViews];
 }
 
 -(void)setImage:(UIImage*)img
 {
 }
 
--(UIImage*)image
+-(UIImage*)screenshot
 {
     CGRect rect = [self bounds];
-    UIGraphicsBeginImageContextWithOptions(rect.size,YES,0.0f);
+    UIGraphicsBeginImageContextWithOptions(rect.size,self.opaque,0.0f);
     CGContextRef context = UIGraphicsGetCurrentContext();
     [self.layer renderInContext:context];   
-    UIImage *capturedImage = UIGraphicsGetImageFromCurrentImageContext();
+    UIImage * img = UIGraphicsGetImageFromCurrentImageContext();
+    if (img)
+    {
+        [img retain];
+        [screen release];
+        screen = img;
+    }
     UIGraphicsEndImageContext();
-    return capturedImage;
+    return screen;
+}
+
+-(UIImage*)image
+{
+    if (vc && (vc.view.superview == self))
+    {
+        LPStackDump();
+        [self screenshot];
+    }
+    return screen;
+}
+
+-(void)notifyScreenViews
+{
+    UIImage * img = [self image];
+    for (LPScreenView * v in screenViews)
+        [v setImage:img];
+}
+
+-(void)removeScreenView:(LPScreenView*)v
+{
+    [screenViews removeObject:v];
+}
+
+-(void)addScreenView:(LPScreenView*)v
+{
+    [screenViews addObject:v];
 }
 
 -(CGRect)wallpaperContentsRect
@@ -140,6 +175,7 @@ CGRect (*LPWallpaperContentsRectForAspectFill)(CGSize, CGRect);
     {
         self.orientation = ori;
         self.variant = var;
+        screenViews = [[NSMutableSet alloc] init];
     }
     return self;
 }
@@ -153,6 +189,8 @@ CGRect (*LPWallpaperContentsRectForAspectFill)(CGSize, CGRect);
         c.lockView = nil;
     [vc release];
     [paper release];
+    [screenViews release];
+    [screen release];
     [super dealloc];
 }
 

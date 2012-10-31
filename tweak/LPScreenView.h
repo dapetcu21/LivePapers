@@ -1,14 +1,15 @@
 #import <UIKit/UIKit.h>
+@class LPView;
 
 @interface LPScreenView : UIImageView
 {
-    UIView * master;
+    LPView * master;
     int orient;
 }
 
 @property(nonatomic, assign) int orientation;
 
 -(void)setOrientation:(int)o duration:(float)f;
--(id)initWithMasterView:(UIView*)v;
+-(id)initWithMasterView:(LPView*)v;
 
 @end
