@@ -13,6 +13,7 @@
 @synthesize restrictAllow;
 @synthesize allowTimeout;
 @synthesize displayStacks;
+@synthesize isLocking;
 
 +(LPController*)sharedInstance
 {
@@ -134,7 +135,6 @@
                 self.allowTimeout++;
             if (![self appOnTop])
             {
-                NSLog(@"apponTop did smth");
                 UIViewController * vc = view.viewController;
                 [vc viewWillDisappear:NO];
                 [vc viewDidDisappear:NO];
@@ -146,14 +146,19 @@
 
 -(BOOL)appOnTop
 {
-    for (int i = 0; i<4; i++)
-        NSLog(@"appOnTop: %@", [displayStacks objectAtIndex:i]);
+    if (isLocking)
+        return appOnTop;
 
     SBDisplayStack * as = (SBDisplayStack*)[displayStacks objectAtIndex:1];
     NSObject * top = [as topDisplay];
     if ([top isKindOfClass:objc_getClass("SBAwayController")])
         return ([(SBDisplayStack*)[displayStacks objectAtIndex:3] topApplication] != nil);
     return ([as topApplication] != nil);
+}
+
+-(void)setAppOnTop:(BOOL)b
+{
+    appOnTop = b;
 }
 
 -(BOOL)seamlessUnlock

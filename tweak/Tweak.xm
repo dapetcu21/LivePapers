@@ -20,8 +20,18 @@
 
 %end
 
-%hook UIViewController 
+%hook SBUIController
+-(void)lockFromSource:(int)src
+{
+    LPController * c = [LPController sharedInstance];
+    c.appOnTop = c.appOnTop;
+    c.isLocking = true;
+    %orig;
+    c.isLocking = false;
+}
+%end
 
+%hook UIViewController 
 -(void)_setViewAppearState:(int)state isAnimating:(BOOL)a
 {
     LPController * c = [LPController sharedInstance];
@@ -36,24 +46,29 @@
             c.allowTimeout = --t;
             if (!t)
             {
-                NSLog(@"-----------------------------");
                 c.allowViewEvents = true;
             }
         }
     }
 }
-
 %end
 
 %hook SBAwayController
 -(void)unlock
 {
-    %log;
     LPController * c = [LPController sharedInstance];
     UIViewController * con = [c wallpaperForVariant:0].viewController;
     [con viewWillAppear:NO];
     %orig;
     [con viewDidAppear:NO];
+}
+- (void)attemptUnlockFromSource:(int)source
+{
+    LPController * c = [LPController sharedInstance];
+    UIViewController * con = [c wallpaperForVariant:0].viewController;
+    [con viewWillAppear:NO];
+    [con viewDidAppear:YES];
+    %orig;
 }
 %end
 
@@ -91,7 +106,6 @@
 %hook SBAlertWindow
 -(void)deactivateAlert:(id)alert
 {
-    %log;
     LPController * c;
     BOOL disable = [alert isKindOfClass:objc_getClass("SBAwayController")] && [(c = [LPController sharedInstance]) seamlessUnlock];
     if (disable)
@@ -109,7 +123,6 @@
 %hook SBWallpaperView
 -(id)initWithOrientation:(int)orient variant:(int)var
 {
-    %log;
     LPController * c = [LPController sharedInstance];
     switch(var)
     {
@@ -139,7 +152,6 @@
 {
 	if ((self=%orig))
 	{
-        NSLog(@"sbdisplaystack %@", self);
 		[[LPController sharedInstance].displayStacks addObject:self];
 	}
 	return self;

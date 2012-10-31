@@ -2,6 +2,8 @@
 
 @class SBUIController, SBWallpaperView, LPView, LPPlugin, LPWallpaper;
 
+#define LPStackDump() NSLog(@"%@", [NSThread callStackSymbols])
+
 @interface LPController : NSObject
 {
     LPView * view;
@@ -9,6 +11,8 @@
     NSMutableDictionary * plugins, * papers;
     LPWallpaper * walls[2];
     BOOL allowViewEvents;
+    BOOL isLocking;
+    BOOL appOnTop;
     int allowTimeout;
     UIViewController * restrictAllow;
     NSMutableArray * displayStacks;
@@ -22,7 +26,8 @@
 @property(nonatomic, assign) int allowTimeout;
 @property(nonatomic, assign) UIViewController * restrictAllow;
 @property(nonatomic, readonly) NSMutableArray * displayStacks;
-@property(nonatomic, readonly) BOOL appOnTop;
+@property(nonatomic, assign) BOOL appOnTop;
+@property(nonatomic, assign) BOOL isLocking;
 
 +(LPController*)sharedInstance;
 
