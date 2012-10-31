@@ -10,17 +10,24 @@
     {
         master = v;
         [master retain];
-        [master addScreenView:self];
-        [self setImage:nil];
     }
     return self;
 }
 
 -(void)dealloc
 {
-    [master removeScreenView:self];
     [master release];
     [super dealloc];
+}
+
+-(void)drawRect:(CGRect)rect
+{
+    bool h = master.hidden;
+    if (h)
+        master.hidden = NO;
+    [master.layer renderInContext:UIGraphicsGetCurrentContext()];
+    if (h)
+        master.hidden = YES;
 }
 
 //-- SBWallpaperView interface
@@ -32,6 +39,11 @@
 
 -(void)setOrientation:(int)o duration:(float)dur
 {
+    if (dur)
+    {
+        [UIView beginAnimations:@"rotateDummyWallpaper" context:nil];
+        [UIView setAnimationDuration: dur];
+    }
     CGRect f = [[UIScreen mainScreen] bounds];
     if (o>2)
     {
@@ -40,18 +52,15 @@
         f.size.height = a;
     }
     self.frame = f;
+    if (dur)
+        [UIView commitAnimations];
     orient = o;
+    [self setNeedsDisplay];
 }
-
 
 -(int)orientation
 {
     return orient;
-}
-
--(void)didMoveToWindow
-{
-    [self setImage:[master image]];
 }
 
 -(CGRect)wallpaperContentsRect

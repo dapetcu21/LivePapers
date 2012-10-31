@@ -132,10 +132,13 @@
         if (view)
         {
             if (walls[1] == walls[0])
+            {
                 self.allowTimeout++;
+                view.viewController = nil;
+            }
             if (![self appOnTop])
             {
-                UIViewController * vc = view.viewController;
+                UIViewController * vc = walls[1].viewController;
                 [vc viewWillDisappear:NO];
                 [vc viewDidDisappear:NO];
             }

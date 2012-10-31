@@ -27,6 +27,7 @@
 -(void)viewWillAppear:(BOOL)animated
 {
     NSLog(@"LivePapers: ---------- viewWillAppear %d", animated);
+    NSLog(@"%@", [NSThread callStackSymbols]);
 }
 
 -(void)viewDidAppear:(BOOL)animated

@@ -24,7 +24,6 @@
 -(void)lockFromSource:(int)src
 {
     LPController * c = [LPController sharedInstance];
-    c.appOnTop = c.appOnTop;
     c.isLocking = true;
     %orig;
     c.isLocking = false;
@@ -54,14 +53,6 @@
 %end
 
 %hook SBAwayController
--(void)unlock
-{
-    LPController * c = [LPController sharedInstance];
-    UIViewController * con = [c wallpaperForVariant:0].viewController;
-    [con viewWillAppear:NO];
-    %orig;
-    [con viewDidAppear:NO];
-}
 - (void)attemptUnlockFromSource:(int)source
 {
     LPController * c = [LPController sharedInstance];

@@ -48,7 +48,6 @@ CGRect (*LPWallpaperContentsRectForAspectFill)(CGSize, CGRect);
     [self setWallImage: LPWallpaperImage(self.variant)];
     [self setWallRect: LPWallpaperContentsRectForAspectFill([image size], f)];
     orient = o;
-    [self notifyScreenViews];
 }
 
 -(void)setImage:(UIImage*)img
@@ -57,6 +56,10 @@ CGRect (*LPWallpaperContentsRectForAspectFill)(CGSize, CGRect);
 
 -(UIImage*)screenshot
 {
+    bool h = self.hidden;
+    if (h)
+        self.hidden = NO;
+
     CGRect rect = [self bounds];
     UIGraphicsBeginImageContextWithOptions(rect.size,self.opaque,0.0f);
     CGContextRef context = UIGraphicsGetCurrentContext();
@@ -69,34 +72,17 @@ CGRect (*LPWallpaperContentsRectForAspectFill)(CGSize, CGRect);
         screen = img;
     }
     UIGraphicsEndImageContext();
+
+    if (h)
+        self.hidden = YES;
     return screen;
 }
 
 -(UIImage*)image
 {
     if (vc && (vc.view.superview == self))
-    {
-        LPStackDump();
         [self screenshot];
-    }
     return screen;
-}
-
--(void)notifyScreenViews
-{
-    UIImage * img = [self image];
-    for (LPScreenView * v in screenViews)
-        [v setImage:img];
-}
-
--(void)removeScreenView:(LPScreenView*)v
-{
-    [screenViews removeObject:v];
-}
-
--(void)addScreenView:(LPScreenView*)v
-{
-    [screenViews addObject:v];
 }
 
 -(CGRect)wallpaperContentsRect
@@ -137,6 +123,16 @@ CGRect (*LPWallpaperContentsRectForAspectFill)(CGSize, CGRect);
 
 -(void)setViewController:(UIViewController*)_vc
 {
+    if (!_vc && vc)
+    {
+        UIImage * img = [self screenshot];
+        UIImageView * iv = [[UIImageView alloc] initWithFrame:self.bounds];
+        iv.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
+        iv.image = img;
+        [self addSubview:iv];
+        [iv release];
+    }
+    
     if (vc)
         [vc.view removeFromSuperview];
     [_vc retain];
@@ -175,7 +171,6 @@ CGRect (*LPWallpaperContentsRectForAspectFill)(CGSize, CGRect);
     {
         self.orientation = ori;
         self.variant = var;
-        screenViews = [[NSMutableSet alloc] init];
     }
     return self;
 }
@@ -189,7 +184,6 @@ CGRect (*LPWallpaperContentsRectForAspectFill)(CGSize, CGRect);
         c.lockView = nil;
     [vc release];
     [paper release];
-    [screenViews release];
     [screen release];
     [super dealloc];
 }

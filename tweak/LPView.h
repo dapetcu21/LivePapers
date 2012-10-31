@@ -11,7 +11,6 @@
     UIImage * screen;
     UIImageView * shotView;
     CGRect imageRect;
-    NSMutableSet * screenViews;
 }
 
 @property(nonatomic, assign) int orientation;
@@ -26,9 +25,5 @@
 -(void)setWallRect:(CGRect)rect;
 
 -(id)initWithOrientation:(int)o variant:(int)v;
-
--(void)addScreenView:(LPScreenView*)v;
--(void)removeScreenView:(LPScreenView*)v;
--(void)notifyScreenViews;
 
 @end

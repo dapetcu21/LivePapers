@@ -1,7 +1,7 @@
 #import <UIKit/UIKit.h>
 @class LPView;
 
-@interface LPScreenView : UIImageView
+@interface LPScreenView : UIView
 {
     LPView * master;
     int orient;
