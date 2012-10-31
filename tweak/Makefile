@@ -1,0 +1,12 @@
+include $(THEOS)/makefiles/common.mk
+
+TWEAK_NAME = LivePapers 
+LivePapers_FRAMEWORKS = UIKit CoreGraphics
+LivePapers_FILES = Tweak.xm \
+                   LPController.m \
+                   LPView.m \
+                   LPScreenView.m \
+                   LPPlugin.m  \
+                   LPWallpaper.m \
+
+include $(THEOS_MAKE_PATH)/tweak.mk

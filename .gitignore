@@ -1,0 +1,15 @@
+build
+obj
+_
+*.pbxuser
+*.mode1v3
+xcuserdata
+*.xcworkspace
+*.o
+*.lo
+.theos
+*.deb
+*.swp
+*~
+
+.DS_Store
