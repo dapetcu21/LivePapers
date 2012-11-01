@@ -21,94 +21,19 @@
 
 %end
 
-%hook SBUIController
--(void)lockFromSource:(int)src
+%hook SpringBoard
+-(void)setBacklightFactor:(float)f keepTouchOn:(BOOL)touch
 {
-    LPController * c = [LPController sharedInstance];
-    c.isLocking = true;
-    %orig;
-    c.isLocking = false;
-}
-%end
-
-%hook UIViewController 
--(void)_setViewAppearState:(int)state isAnimating:(BOOL)a
-{
-    LPController * c = [LPController sharedInstance];
-    UIViewController * r = c.restrictAllow;
-    if (c.allowViewEvents || (r && (r != self)))
+    static BOOL backlight = YES;
+    BOOL b = (f != 0);
+    if (b != backlight)
     {
-        %orig;
-    } else {
-        int t = c.allowTimeout;
-        if (t)
-        {
-            c.allowTimeout = --t;
-            if (!t)
-            {
-                c.allowViewEvents = true;
-            }
-        }
-    }
-}
-%end
-
-%hook SBAwayController
-- (void)attemptUnlockFromSource:(int)source
-{
-    LPController * c = [LPController sharedInstance];
-    LPIntermediateVC * con = [c wallpaperForVariant:0].viewController;
-    [con viewWillAppear:NO];
-    [con viewDidAppear:YES];
-    %orig;
-}
-%end
-
-%hook SBAwayView
--(void)dealloc
-{
-    LPController * c = [LPController sharedInstance];
-    LPIntermediateVC * con = nil;
-    if (![c seamlessUnlock])
-    {
-        con = [c wallpaperForVariant:1].viewController;
-        [con viewWillAppear:NO];
+        LPController * c = [LPController sharedInstance];
+        [c wallpaperForVariant:0].viewController.screenLit = b;
+        [c wallpaperForVariant:1].viewController.screenLit = b;
+        backlight = b;
     }
     %orig;
-    [con viewDidAppear:NO];
-}
-%end
-
-%hook SBDisplay
--(void)handleLock:(BOOL)lock
-{
-    LPController * c = [LPController sharedInstance];
-    if (c.appOnTop)
-    {
-        %orig;
-        return;
-    }
-    LPIntermediateVC * con = [c wallpaperForVariant:0].viewController;
-    [con viewWillDisappear:NO];
-    %orig;
-    [con viewDidDisappear:NO];
-}
-%end
-
-%hook SBAlertWindow
--(void)deactivateAlert:(id)alert
-{
-    LPController * c;
-    BOOL disable = [alert isKindOfClass:objc_getClass("SBAwayController")] && [(c = [LPController sharedInstance]) seamlessUnlock];
-    if (disable)
-    {
-        c.allowViewEvents = c.appOnTop;
-        c.allowTimeout = 0;
-        c.restrictAllow = nil;
-    }
-    %orig;
-    if (disable)
-        c.allowViewEvents = true;
 }
 %end
 
@@ -136,23 +61,6 @@
         }
     }
     return %orig;
-}
-%end
-
-%hook SBDisplayStack
--(id)init
-{
-	if ((self=%orig))
-	{
-		[[LPController sharedInstance].displayStacks addObject:self];
-	}
-	return self;
-}
-
--(void)dealloc
-{
-	[[LPController sharedInstance].displayStacks removeObject:self];
-	%orig;
 }
 %end
 

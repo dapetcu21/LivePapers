@@ -10,11 +10,6 @@
 @synthesize uiController;
 @synthesize wallpaperView;
 @synthesize view;
-@synthesize allowViewEvents;
-@synthesize restrictAllow;
-@synthesize allowTimeout;
-@synthesize displayStacks;
-@synthesize isLocking;
 
 +(LPController*)sharedInstance
 {
@@ -30,10 +25,6 @@
     {
         plugins = [[NSMutableDictionary alloc] init];
         papers = [[NSMutableDictionary alloc] init];
-        displayStacks = [[NSMutableArray alloc] init];
-        allowViewEvents = YES;
-        allowTimeout = 0;
-        restrictAllow = nil;
     }
     return self;
 }
@@ -43,7 +34,6 @@
     [view release];
     [lockView release];
     [plugins release];
-    [displayStacks release];
     [papers release];
     [walls[0] release];
     [walls[1] release];
@@ -112,57 +102,14 @@
 -(void)setLockView:(LPView*)v
 {
     if (lockView && !v && view && walls[1] && (walls[1] == walls[0]))
-    {
-        if (![self appOnTop])
-        {
-            self.allowViewEvents = false;
-            self.restrictAllow = walls[1].viewController;
-            self.allowTimeout = 2;
-        }
         view.wallpaper = walls[1];
-    }
     lockView = v;
     if (v)
     {
-        if (walls[0])
-        {
-            self.allowViewEvents = false;
-            self.restrictAllow = walls[0].viewController;
-            self.allowTimeout = 2;
-        }
-        if (view)
-        {
-            if (walls[1] == walls[0])
-            {
-                self.allowTimeout++;
-                view.viewController = nil;
-            }
-            if (![self appOnTop])
-            {
-                LPIntermediateVC * vc = walls[1].viewController;
-                [vc viewWillDisappear:NO];
-                [vc viewDidDisappear:NO];
-            }
-        }
+        if (view && (walls[1] == walls[0]))
+            view.viewController = nil;
         v.wallpaper = walls[0];
     }
-}
-
--(BOOL)appOnTop
-{
-    if (isLocking)
-        return appOnTop;
-
-    SBDisplayStack * as = (SBDisplayStack*)[displayStacks objectAtIndex:1];
-    NSObject * top = [as topDisplay];
-    if ([top isKindOfClass:objc_getClass("SBAwayController")])
-        return ([(SBDisplayStack*)[displayStacks objectAtIndex:3] topApplication] != nil);
-    return ([as topApplication] != nil);
-}
-
--(void)setAppOnTop:(BOOL)b
-{
-    appOnTop = b;
 }
 
 -(BOOL)seamlessUnlock
