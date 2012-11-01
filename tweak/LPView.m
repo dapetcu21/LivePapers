@@ -2,16 +2,12 @@
 #import "LPScreenView.h"
 #import "LPWallpaper.h"
 #import "LPController.h"
+#import "LPIntermediateVC.h"
 
 #include <dlfcn.h>
 
 UIImage * (*LPWallpaperImage)(int variant);
 CGRect (*LPWallpaperContentsRectForAspectFill)(CGSize, CGRect);
-
-@protocol LPViewController
--(void)setWallpaperImage:(UIImage*)img;
--(void)setWallpaperRect:(CGRect)r;
-@end
 
 @implementation LPView
 @synthesize variant;
@@ -43,8 +39,10 @@ CGRect (*LPWallpaperContentsRectForAspectFill)(CGSize, CGRect);
         f.size.height = a;
     }
     self.frame = f;
+    CGRect b = self.bounds;
     if (vc)
-        vc.view.frame = self.bounds;
+        vc.view.frame = b;
+    [self viewWithTag:12424].frame = b;
     [self setWallImage: LPWallpaperImage(self.variant)];
     [self setWallRect: LPWallpaperContentsRectForAspectFill([image size], f)];
     orient = o;
@@ -108,7 +106,7 @@ CGRect (*LPWallpaperContentsRectForAspectFill)(CGSize, CGRect);
     return paper;
 }
 
--(UIViewController*)viewController
+-(LPIntermediateVC*)viewController
 {
     return vc;
 }
@@ -121,14 +119,14 @@ CGRect (*LPWallpaperContentsRectForAspectFill)(CGSize, CGRect);
     self.viewController = paper.viewController;
 }
 
--(void)setViewController:(UIViewController*)_vc
+-(void)setViewController:(LPIntermediateVC*)_vc
 {
     if (!_vc && vc)
     {
-        UIImage * img = [self screenshot];
         UIImageView * iv = [[UIImageView alloc] initWithFrame:self.bounds];
         iv.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
-        iv.image = img;
+        iv.image = [self screenshot];
+        iv.tag = 12424;
         [self addSubview:iv];
         [iv release];
     }
@@ -144,6 +142,7 @@ CGRect (*LPWallpaperContentsRectForAspectFill)(CGSize, CGRect);
         UIView * v = vc.view;
         [v setFrame:[self bounds]];
         [self addSubview:v];
+        [[self viewWithTag:12424] removeFromSuperview];
         [self setWallImage: image];
         [self setWallRect:imageRect];
     }
@@ -154,15 +153,13 @@ CGRect (*LPWallpaperContentsRectForAspectFill)(CGSize, CGRect);
     [img retain];
     [image release];
     image = img;
-    if (vc && [vc respondsToSelector:@selector(setWallpaperImage:)])
-        [(UIViewController<LPViewController>*)vc setWallpaperImage:image];
+    [vc setWallpaperImage:image];
 }
 
 -(void)setWallRect:(CGRect)r
 {
     imageRect = r;
-    if (vc && [vc respondsToSelector:@selector(setWallpaperRect:)])
-        [(UIViewController<LPViewController>*)vc setWallpaperRect:r];
+    [vc setWallpaperRect:r];
 }
 
 -(id)initWithOrientation:(int)ori variant:(int)var

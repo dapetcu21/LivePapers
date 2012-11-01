@@ -1,16 +1,16 @@
-@class UIViewController, LPPlugin;
+@class LPIntermediateVC, LPPlugin;
 
 @interface LPWallpaper : NSObject
 {
     NSString * name;
     LPPlugin * plugin;
-    UIViewController * vc;
+    LPIntermediateVC * vc;
 }
 
 @property(nonatomic, readonly) NSString * name;
-@property(nonatomic, readonly) UIViewController * viewController;
+@property(nonatomic, readonly) LPIntermediateVC * viewController;
 
 -(id)initWithName:(NSString*)name;
--(UIViewController*)viewController;
+-(LPIntermediateVC*)viewController;
 
 @end

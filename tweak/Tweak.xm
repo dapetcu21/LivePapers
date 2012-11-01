@@ -6,6 +6,7 @@
 
 #import "LPView.h"
 #import "LPScreenView.h"
+#import "LPIntermediateVC.h"
 #import "LPWallpaper.h"
 
 %hook SpringBoard 
@@ -56,7 +57,7 @@
 - (void)attemptUnlockFromSource:(int)source
 {
     LPController * c = [LPController sharedInstance];
-    UIViewController * con = [c wallpaperForVariant:0].viewController;
+    LPIntermediateVC * con = [c wallpaperForVariant:0].viewController;
     [con viewWillAppear:NO];
     [con viewDidAppear:YES];
     %orig;
@@ -67,7 +68,7 @@
 -(void)dealloc
 {
     LPController * c = [LPController sharedInstance];
-    UIViewController * con = nil;
+    LPIntermediateVC * con = nil;
     if (![c seamlessUnlock])
     {
         con = [c wallpaperForVariant:1].viewController;
@@ -87,7 +88,7 @@
         %orig;
         return;
     }
-    UIViewController * con = [c wallpaperForVariant:0].viewController;
+    LPIntermediateVC * con = [c wallpaperForVariant:0].viewController;
     [con viewWillDisappear:NO];
     %orig;
     [con viewDidDisappear:NO];

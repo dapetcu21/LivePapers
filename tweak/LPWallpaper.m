@@ -1,6 +1,7 @@
 #import "LPWallpaper.h"
 #import "LPPlugin.h"
 #import "LPController.h"
+#import "LPIntermediateVC.h"
 #import <UIKit/UIKit.h>
 
 @implementation LPWallpaper
@@ -24,7 +25,7 @@
     [super dealloc];
 }
 
--(UIViewController*)viewController
+-(LPIntermediateVC*)viewController
 {
     if (!vc)
     {
@@ -33,10 +34,17 @@
             NSString * pluginName = [NSString stringWithString:[info objectForKey:@"Plugin"]];
             NSObject * ud = [info objectForKey:@"User Data"];
             plugin = [[[LPController sharedInstance] pluginNamed:pluginName] retain];
-            vc = [plugin newViewController:ud];
+            UIViewController * v = [plugin newViewController:ud];
+            vc = [[LPIntermediateVC alloc] initWithViewController:v];
+            [v release];
         }
         @catch(NSException * ex) {
             NSLog(@"LivePapers: Cannot load wallpaper %@: %@", name, ex);
+            if (plugin)
+            {
+                [plugin release];
+                plugin = nil;
+            }
         }
     }
     return vc;

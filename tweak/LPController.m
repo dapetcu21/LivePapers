@@ -2,6 +2,7 @@
 #import "LPView.h"
 #import "LPWallpaper.h"
 #import "LPPlugin.h"
+#import "LPIntermediateVC.h"
 #import <SpringBoard/SpringBoard.h>
 #import <SpringBoard/SBWallpaperView.h>
 
@@ -138,7 +139,7 @@
             }
             if (![self appOnTop])
             {
-                UIViewController * vc = walls[1].viewController;
+                LPIntermediateVC * vc = walls[1].viewController;
                 [vc viewWillDisappear:NO];
                 [vc viewDidDisappear:NO];
             }

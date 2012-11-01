@@ -8,5 +8,6 @@ LivePapers_FILES = Tweak.xm \
                    LPScreenView.m \
                    LPPlugin.m  \
                    LPWallpaper.m \
+                   LPIntermediateVC.m \
 
 include $(THEOS_MAKE_PATH)/tweak.mk

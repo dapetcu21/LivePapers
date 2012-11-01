@@ -1,12 +1,12 @@
 #include <UIKit/UIKit.h>
 
-@class LPWallpaper, LPScreenView;
+@class LPWallpaper, LPScreenView, LPIntermediateVC;
 
 @interface LPView : UIView
 {
     int orient;
     LPWallpaper * paper;
-    UIViewController * vc;
+    LPIntermediateVC * vc;
     UIImage * image;
     UIImage * screen;
     UIImageView * shotView;
@@ -16,7 +16,7 @@
 @property(nonatomic, assign) int orientation;
 @property(nonatomic, assign) int variant;
 @property(nonatomic, retain) LPWallpaper * wallpaper;
-@property(nonatomic, retain) UIViewController * viewController;
+@property(nonatomic, retain) LPIntermediateVC * viewController;
 
 -(UIImage*)screenshot;
 -(UIImage*)image;
