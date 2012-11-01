@@ -1,6 +1,4 @@
-#import <SpringBoard/SBDisplayStack.h>
-
-@class SBUIController, SBWallpaperView, LPView, LPPlugin, LPWallpaper;
+@class LPView, LPPlugin, LPWallpaper;
 
 #define LPStackDump() NSLog(@"%@", [NSThread callStackSymbols])
 
@@ -12,8 +10,6 @@
     LPWallpaper * walls[2];
 }
 
-@property(nonatomic, assign) SBUIController * uiController;
-@property(nonatomic, assign) SBWallpaperView ** wallpaperView;
 @property(nonatomic, assign) LPView * view;
 @property(nonatomic, assign) LPView * lockView;
 
@@ -26,7 +22,5 @@
 
 -(void)setWallpaper:(LPWallpaper*)wall forVariant:(int)var;
 -(LPWallpaper*)wallpaperForVariant:(int)var;
-
--(BOOL)seamlessUnlock;
 
 @end

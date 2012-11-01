@@ -7,8 +7,6 @@
 #import <SpringBoard/SBWallpaperView.h>
 
 @implementation LPController
-@synthesize uiController;
-@synthesize wallpaperView;
 @synthesize view;
 
 +(LPController*)sharedInstance
@@ -110,11 +108,6 @@
             view.viewController = nil;
         v.wallpaper = walls[0];
     }
-}
-
--(BOOL)seamlessUnlock
-{
-    return (view && lockView && walls[0] && (walls[1] == walls[0]));
 }
 
 -(void)setView:(LPView*)v
