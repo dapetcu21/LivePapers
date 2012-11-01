@@ -2,6 +2,7 @@
 
 @interface LPDefaultViewController : UIViewController
 {
+    UIImageView * imageView, * gradient;
 }
 
 @end

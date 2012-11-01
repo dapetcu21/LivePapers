@@ -19,9 +19,6 @@
     [c setWallpaper:[c wallpaperNamed:@"com.dapetcu21.livepapers.default"] forVariant:1];
 }
 
-%end
-
-%hook SpringBoard
 -(void)setBacklightFactor:(float)f keepTouchOn:(BOOL)touch
 {
     static BOOL backlight = YES;
