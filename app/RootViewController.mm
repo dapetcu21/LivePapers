@@ -22,7 +22,7 @@
     flowView.sideCoverZPosition = -150;
     flowView.sideOffset = 50;
     flowView.coverSpacing = 300;
-    flowView.dragDivisor = 0.9;
+    flowView.dragDivisor = 0.7;
     flowView.coverHeightOffset = 0;
     flowView.dataSource = self;
     flowView.viewDelegate = self;
@@ -180,6 +180,7 @@
 {
 }
 
+/*
 - (void)openFlowViewScrollingDidBegin:(AFOpenFlowView *)openFlowView
 {
     [UIView beginAnimations:@"meow" context:nil];
@@ -194,7 +195,7 @@
     [UIView setAnimationDuration:0.25];
     [label setAlpha:1];
     [UIView commitAnimations];
-}
+} */
 
 - (void)openFlowView:(AFOpenFlowView *)openFlowView selectionDidChange:(NSInteger)index
 {
