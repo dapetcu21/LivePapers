@@ -1,5 +1,6 @@
 #import "LPPlugin.h"
 #import "LPController.h"
+#import "LPCommon.h"
 #include <dlfcn.h>
 
 @implementation LPPlugin
@@ -11,13 +12,13 @@
     {
         name = [s retain];
         dlerror();
-        NSString * libName = [NSString stringWithFormat:@"/Library/LivePapers/Plugins/%@.dylib", name];
+        NSString * libName = [NSString stringWithFormat:@"%@/%@.dylib", LCPluginsPath, name];
         lib = dlopen([libName UTF8String], RTLD_LAZY | RTLD_LOCAL);
         if (!lib)
         {
             [self release];
             @throw [NSException 
-                exceptionWithName:@"PLDlopenException"
+                exceptionWithName:@"LPDlopenException"
                 reason: [NSString stringWithFormat:@"Cannot open %@: %s", libName, dlerror()]
                 userInfo: nil];
         }

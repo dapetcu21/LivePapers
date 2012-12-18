@@ -2,6 +2,7 @@
 #import "LPPlugin.h"
 #import "LPController.h"
 #import "LPIntermediateVC.h"
+#import "LPCommon.h"
 #import <UIKit/UIKit.h>
 
 @implementation LPWallpaper
@@ -30,7 +31,7 @@
     if (!vc)
     {
         @try {
-            NSDictionary * info = [NSDictionary dictionaryWithContentsOfFile:[NSString stringWithFormat:@"/Library/LivePapers/Wallpapers/%@/Info.plist", name]];
+            NSDictionary * info = [NSDictionary dictionaryWithContentsOfFile:[NSString stringWithFormat:@"%@/%@/Info.plist", LCWallpapersPath, name]];
             NSString * pluginName = [NSString stringWithString:[info objectForKey:@"Plugin"]];
             NSObject * ud = [info objectForKey:@"User Data"];
             plugin = [[[LPController sharedInstance] pluginNamed:pluginName] retain];

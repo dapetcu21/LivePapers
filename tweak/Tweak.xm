@@ -14,9 +14,7 @@
 -(void)applicationDidFinishLaunching:(UIApplication*)app
 {
     %orig;
-    LPController * c = [LPController sharedInstance];
-    [c setWallpaper:[c wallpaperNamed:@"com.dapetcu21.livepapers.default"] forVariant:0];
-    [c setWallpaper:[c wallpaperNamed:@"com.dapetcu21.livepapers.default"] forVariant:1];
+    [LPController sharedInstance];
 }
 
 -(void)setBacklightFactor:(float)f keepTouchOn:(BOOL)touch

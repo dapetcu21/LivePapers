@@ -1,0 +1,9 @@
+Package: org.porkholt.LivePapers
+Name: LivePapers
+Depends: 
+Version: 0.0.1
+Architecture: iphoneos-arm
+Description: An awesome application!
+Maintainer: Marius Petcu
+Author: Marius Petcu
+Section: Utilities

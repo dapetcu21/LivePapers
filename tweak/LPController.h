@@ -1,6 +1,8 @@
-@class LPView, LPPlugin, LPWallpaper;
+@class LPView, LPPlugin, LPWallpaper, CPDistributedMessagingCenter;
 
 #define LPStackDump() NSLog(@"%@", [NSThread callStackSymbols])
+#define LPLockScreenVariant 0
+#define LPHomeScreenVariant 1
 
 @interface LPController : NSObject
 {
@@ -8,6 +10,7 @@
     LPView * lockView;
     NSMutableDictionary * plugins, * papers;
     LPWallpaper * walls[2];
+    CPDistributedMessagingCenter * center;
 }
 
 @property(nonatomic, assign) LPView * view;
@@ -22,5 +25,8 @@
 
 -(void)setWallpaper:(LPWallpaper*)wall forVariant:(int)var;
 -(LPWallpaper*)wallpaperForVariant:(int)var;
+
+-(void)reloadSettings;
+-(void)reloadSettingsWithMessage:(NSString*)message userData:(NSDictionary*)userData;
 
 @end

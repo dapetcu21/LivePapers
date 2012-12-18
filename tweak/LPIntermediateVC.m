@@ -37,7 +37,8 @@
         viewShowing = NO;
         screenLit = YES;
         [vc retain];
-        [self addChildViewController:vc];
+        if (vc)
+            [self addChildViewController:vc];
     }
     return self;
 }

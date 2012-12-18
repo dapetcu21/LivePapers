@@ -1,4 +1,4 @@
-Package: com.dapetcu21.lpbuiltins
+Package: org.porkholt.livepapers.builtins
 Name: LPBuiltins
 Depends: 
 Version: 0.0.1
