@@ -3,23 +3,31 @@
 #import "AFOpenFlowViewDataSource.h"
 
 @class LPPaper;
+@class LPPreviewView;
 
-@interface RootViewController: UIViewController<AFOpenFlowViewDataSource, AFOpenFlowViewDelegate> {
+@interface LPRootViewController: UIViewController<AFOpenFlowViewDataSource, AFOpenFlowViewDelegate> {
     AFOpenFlowView * flowView;
     UIImage * defaultImage; 
+    UIImage * moreImage;
     NSMutableArray * papers;
     UILabel * label;
     UIImageView * background;
-    UIImageView * bar;
-    UIButton * homeButton, * lockButton, * settingsButton;
+    UINavigationBar * bar;
+    UINavigationItem * barItem;
+    UIBarButtonItem * homeButton, * lockButton, * settingsButton;
     UIImageView * homeBadge, * lockBadge;
-    UIView * container;
 
     NSString * homePaper, * lockPaper;
+
+    LPPreviewView * preview;
+    NSTimer * timer;
 }
 
 - (void)loadPapers;
 - (void)selectedPaper:(LPPaper*)p;
 - (void)saveSettings:(NSString*)s;
+- (void)armTimer;
+- (void)disarmTimer;
+- (void)timerFired;
 
 @end

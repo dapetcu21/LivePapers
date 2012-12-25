@@ -45,16 +45,37 @@
 
 @implementation AFOpenFlowView
 
+- (CGRect)previewFrameForIndex:(NSInteger)index
+{
+    AFItem * item = [self coverForIndex:index];
+    CGRect layerFrame = item.imageLayer.frame;
+    return layerFrame;
+}
+
 //@synthesize dragOffset;
--(void)setDragOffset:(CGFloat)f
+- (void)setDragOffset:(CGFloat)f
 {
     dragOffset = f;
     [self layoutCovers];
 }
--(CGFloat)dragOffset
+- (CGFloat)dragOffset
 {
     return dragOffset;
 }
+
+//@synthesize flipRotation;
+- (void)setFlipRotation:(CGFloat)f
+{
+    flipRotation = f;
+    [self layoutCovers];
+}
+
+- (CGFloat)flipRotation
+{
+    return flipRotation;
+}
+
+@synthesize flipView;
 
 @synthesize dataSource; 
 @synthesize viewDelegate;
@@ -167,7 +188,7 @@ NS_INLINE NSRange NSMakeRangeToIndex(NSUInteger loc, NSUInteger loc2) {
 	
 	// Set some perspective
 	CATransform3D sublayerTransform = CATransform3DIdentity;
-	sublayerTransform.m34 = -0.01;
+	sublayerTransform.m34 = -0.002;
 	[self.layer setSublayerTransform:sublayerTransform];
 }
 
@@ -255,15 +276,15 @@ NS_INLINE NSRange NSMakeRangeToIndex(NSUInteger loc, NSUInteger loc2) {
         newPosition.x += sideOffset;
 	
 	newPosition.x += position * self.centerCoverOffset; 
-	
+
 	if (position < 0) {
 		newTransform = leftTransform; 
 	} else if (position > 0) {
 		newTransform = rightTransform;
 	} else {
 		newZPosition = 0;
-		newTransform = CATransform3DIdentity;
-	}
+		newTransform = CATransform3DMakeRotation(flipRotation, 0, 1, 0);
+    }
 
 	[CATransaction begin];
 		if (animated) {
@@ -274,15 +295,21 @@ NS_INLINE NSRange NSMakeRangeToIndex(NSUInteger loc, NSUInteger loc2) {
 		aCover.imageLayer.position = newPosition;
 	[CATransaction commit];
 	
+    BOOL flip = (position == 0 && flipView);
 	
 	[CATransaction begin];
-		if (animated) {
+		if (animated && !flip) {
 			[CATransaction setValue:[NSNumber numberWithFloat:0.25f] forKey:kCATransactionAnimationDuration];
 		} else {
 			[CATransaction setValue:[NSNumber numberWithFloat:0.00f] forKey:kCATransactionAnimationDuration];
 		}
-		aCover.imageLayer.transform = newTransform;
-		aCover.imageLayer.zPosition = newZPosition;
+        aCover.imageLayer.transform = newTransform;
+        aCover.imageLayer.zPosition = newZPosition;
+        if (flip)
+        {
+            flipView.layer.transform = CATransform3DRotate(newTransform, M_PI, 0, 1, 0);
+            flipView.layer.zPosition = newZPosition;
+        }
 	[CATransaction commit];
 }
 
@@ -371,6 +398,8 @@ NS_INLINE NSRange NSMakeRangeToIndex(NSUInteger loc, NSUInteger loc2) {
 #pragma mark Touch management 
 
 - (void)touchesBegan:(NSSet *)touches withEvent:(UIEvent *)event {
+    if (flipView) return;
+
 	startPoint = [[touches anyObject] locationInView:self];
 	
 	isDraggingACover = NO;
@@ -396,6 +425,8 @@ NS_INLINE NSRange NSMakeRangeToIndex(NSUInteger loc, NSUInteger loc2) {
 
 
 - (void)touchesMoved:(NSSet *)touches withEvent:(UIEvent *)event {
+    if (flipView) return;
+
 	isSingleTap = NO;
 	isDoubleTap = NO;
 	
@@ -429,7 +460,19 @@ NS_INLINE NSRange NSMakeRangeToIndex(NSUInteger loc, NSUInteger loc2) {
 }
 
 - (void)touchesEnded:(NSSet *)touches withEvent:(UIEvent *)event {
-	
+    if (flipView)
+    {
+        TPPropertyAnimation *animation = [TPPropertyAnimation propertyAnimationWithKeyPath:@"flipRotation"];
+        animation.fromValue = [NSNumber numberWithFloat:M_PI];
+        animation.toValue = [NSNumber numberWithFloat:0];
+        animation.duration = 1;
+        animation.delegate = self;
+        animation.timing = TPPropertyAnimationTimingEaseInEaseOut;
+        [animation beginWithTarget:self];
+
+        self.userInteractionEnabled = NO;
+        return;
+    }
 	
 	if (isSingleTap) {
 		// Which cover did the user tap?
@@ -572,6 +615,42 @@ NS_INLINE NSRange NSMakeRangeToIndex(NSUInteger loc, NSUInteger loc2) {
     if ([self.viewDelegate respondsToSelector:@selector(openFlowViewAnimationDidEnd:)]) {
         [self.viewDelegate openFlowViewAnimationDidEnd:self];    
 	}
+}
+
+- (void)flipWithView:(UIView*)view
+{
+    AFItem * item = self.selectedCoverView;
+    flipView = view;
+    view.frame = [self previewFrameForIndex:item.number];
+    [self addSubview:flipView];
+    flipView.layer.doubleSided = NO;
+    flipView.layer.transform = CATransform3DMakeRotation(M_PI, 0, 1, 0);
+    item.imageLayer.doubleSided = NO;
+
+    TPPropertyAnimation *animation = [TPPropertyAnimation propertyAnimationWithKeyPath:@"flipRotation"];
+    animation.fromValue = [NSNumber numberWithFloat:0];
+    animation.toValue = [NSNumber numberWithFloat:M_PI];
+    animation.duration = 1;
+    animation.delegate = self;
+    animation.timing = TPPropertyAnimationTimingEaseInEaseOut;
+    [animation beginWithTarget:self];
+
+    self.userInteractionEnabled = NO;
+}
+
+- (void)propertyAnimationDidFinish:(TPPropertyAnimation*)animation
+{
+    if ([animation.keyPath isEqual:@"flipRotation"])
+    {
+        self.userInteractionEnabled = YES;
+        if ([animation.toValue isEqual:[NSNumber numberWithFloat:0]])
+        {
+           [flipView removeFromSuperview];
+           flipView = nil;
+           if ([viewDelegate respondsToSelector:@selector(openFlowFlipViewDidEnd:)])
+               [viewDelegate openFlowFlipViewDidEnd:self];
+        }
+    }
 }
 
 

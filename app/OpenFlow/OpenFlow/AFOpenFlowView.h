@@ -46,6 +46,8 @@
 	CGFloat reflectionFraction; 
 	CGFloat coverHeightOffset; 
 	CGFloat coverImageSize; 
+
+    CGFloat flipRotation;
 	
 	UIColor *backingColor;
 	
@@ -68,6 +70,7 @@
 	NSInteger selectedCoverAtDragStart; 
 	CGFloat dragOffset; 
 	CGPoint startPoint;
+    UIView * flipView;
 }
 
 @property (assign, nonatomic) id <AFOpenFlowViewDataSource> dataSource;
@@ -92,9 +95,12 @@
 @property (retain, nonatomic) UIImage *defaultImage;
 @property NSInteger numberOfImages;
 @property (retain, nonatomic) AFItem *selectedCoverView;
+@property (readonly, nonatomic) UIView * flipView;
 
 - (void)reloadData; 
 - (void)setSelectedCover:(NSInteger)newSelectedCover;
 - (void)setImage:(UIImage *)image forIndex:(NSInteger)index;
+- (CGRect)previewFrameForIndex:(NSInteger)index;
+- (void)flipWithView:(UIView*)view;
 
 @end

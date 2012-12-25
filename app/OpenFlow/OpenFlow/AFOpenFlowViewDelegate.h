@@ -36,4 +36,5 @@
 - (void)openFlowViewAnimationDidEnd:(AFOpenFlowView *)openFlowView;
 - (void)openFlowViewScrollingDidBegin:(AFOpenFlowView *)openFlowView;
 - (void)openFlowViewScrollingDidEnd:(AFOpenFlowView *)openFlowView;
+- (void)openFlowFlipViewDidEnd:(AFOpenFlowView *)openFlowView;
 @end

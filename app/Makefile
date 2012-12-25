@@ -7,9 +7,13 @@ OpenFlow_FILES = \
     OpenFlow/OpenFlow/AFUIImageReflection.m
 
 LivePapers_FILES = main.m \
-    LivePapersApplication.mm \
-    RootViewController.mm \
+    LivePapersApplication.m \
+    LPRootViewController.m \
     LPPaper.m \
+    LPPreviewView.m \
+    LPPreview.m \
+    LPPaper.m \
+    LPPlugin.m \
     TPPropertyAnimation.m \
     $(OpenFlow_FILES)
 
