@@ -47,6 +47,10 @@
 	CGFloat coverHeightOffset; 
 	CGFloat coverImageSize; 
 
+    CGFloat flipFrontOffset;
+    CGFloat flipHeightScale;
+    CATransform3D flipInitial;
+
     CGFloat flipRotation;
 	
 	UIColor *backingColor;
@@ -87,6 +91,7 @@
 @property (assign, nonatomic) CGFloat reflectionFraction; 
 @property (assign, nonatomic) CGFloat coverHeightOffset; 
 @property (assign, nonatomic) CGFloat coverImageSize; 
+
 
 @property (retain, nonatomic) UIColor *backingColor; 
 

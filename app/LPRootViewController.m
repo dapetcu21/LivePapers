@@ -10,6 +10,9 @@
 @implementation LPRootViewController
 - (void)loadView {
     [self loadPapers];
+
+    BOOL iPad = (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad);
+
     defaultImage = [[UIImage imageNamed:@"placeholder"] retain];
     moreImage = [[UIImage imageNamed:@"more"] retain];
 
@@ -19,12 +22,15 @@
     view.image = [UIImage imageNamed:@"background"];
     self.view = view;
 
+    CGFloat scale = r.size.width / 768.0f;
     flowView = [[AFOpenFlowView alloc] initWithFrame:view.bounds];
-    CGFloat s = r.size.height * 0.7;
+    CGFloat s = r.size.width * (1024.0/768.0) * 0.7;
+//    flowView.sideCoverAngle = 0.5;
     flowView.coverImageSize = s;
-    flowView.sideCoverZPosition = -150;
-    flowView.sideOffset = 50;
-//    flowView.coverSpacing = 300;
+    flowView.sideCoverZPosition = -140 * scale;
+    flowView.sideOffset = 80 * scale;
+    flowView.coverSpacing = 40 * scale;
+    flowView.centerCoverOffset = 60 * scale;
     flowView.dragDivisor = 3;
     flowView.coverHeightOffset = 0;
     flowView.dataSource = self;
@@ -33,7 +39,6 @@
 
     bar = [[UINavigationBar alloc] initWithFrame:CGRectMake(view.bounds.origin.x, view.bounds.origin.y, r.size.width, 44)];
     [flowView addSubview:bar];
-    BOOL iPad = (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad);
     if (!iPad)
         bar.barStyle = UIBarStyleBlack;
 
@@ -124,7 +129,12 @@
         {
             flippedPaper = paper;
             [paper.preview retain];
-            [flowView flipWithView:viewController.view];
+            UIView * view = viewController.view;
+            if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad)
+                view.frame = [flowView previewFrameForIndex:index];
+            else
+                view.frame = flowView.bounds;
+            [flowView flipWithView:view];
 
             [timer invalidate];
             timer = nil;

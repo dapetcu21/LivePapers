@@ -27,6 +27,8 @@
 #import "AFUIImageReflection.h"
 #import "TPPropertyAnimation.h"
 
+#define PERSPECTIVE (-0.002f)
+
 @interface AFOpenFlowView (hidden)
 
 - (void)resetDataState;
@@ -163,7 +165,7 @@ NS_INLINE NSRange NSMakeRangeToIndex(NSUInteger loc, NSUInteger loc2) {
 	self.reflectionFraction = REFLECTION_FRACTION;
 	self.coverHeightOffset = COVER_HEIGHT_OFFSET;
 	self.coverImageSize = COVER_IMAGE_SIZE; //TODO: Check this might not be used. 
-	
+
 	self.backingColor = self.backgroundColor; 
     self.sideOffset = 0;
 }
@@ -188,7 +190,7 @@ NS_INLINE NSRange NSMakeRangeToIndex(NSUInteger loc, NSUInteger loc2) {
 	
 	// Set some perspective
 	CATransform3D sublayerTransform = CATransform3DIdentity;
-	sublayerTransform.m34 = -0.002;
+	sublayerTransform.m34 = PERSPECTIVE;
 	[self.layer setSublayerTransform:sublayerTransform];
 }
 
@@ -277,13 +279,23 @@ NS_INLINE NSRange NSMakeRangeToIndex(NSUInteger loc, NSUInteger loc2) {
 	
 	newPosition.x += position * self.centerCoverOffset; 
 
+    BOOL flip = (position == 0 && flipView);
+
 	if (position < 0) {
 		newTransform = leftTransform; 
 	} else if (position > 0) {
 		newTransform = rightTransform;
 	} else {
-		newZPosition = 0;
-		newTransform = CATransform3DMakeRotation(flipRotation, 0, 1, 0);
+        if (flip)
+        {
+            CGFloat r = flipRotation / M_PI;
+            newTransform = CATransform3DMakeScale(1, 1 + (flipHeightScale - 1) * r, 1);
+            newTransform = CATransform3DRotate(newTransform, flipRotation, 0, 1, 0);
+            newZPosition = flipFrontOffset * r;
+        } else {
+            newTransform = CATransform3DIdentity;
+            newZPosition = 0;
+        }
     }
 
 	[CATransaction begin];
@@ -295,8 +307,6 @@ NS_INLINE NSRange NSMakeRangeToIndex(NSUInteger loc, NSUInteger loc2) {
 		aCover.imageLayer.position = newPosition;
 	[CATransaction commit];
 	
-    BOOL flip = (position == 0 && flipView);
-	
 	[CATransaction begin];
 		if (animated && !flip) {
 			[CATransaction setValue:[NSNumber numberWithFloat:0.25f] forKey:kCATransactionAnimationDuration];
@@ -307,7 +317,7 @@ NS_INLINE NSRange NSMakeRangeToIndex(NSUInteger loc, NSUInteger loc2) {
         aCover.imageLayer.zPosition = newZPosition;
         if (flip)
         {
-            flipView.layer.transform = CATransform3DRotate(newTransform, M_PI, 0, 1, 0);
+            flipView.layer.transform = CATransform3DConcat(flipInitial, newTransform);
             flipView.layer.zPosition = newZPosition;
         }
 	[CATransaction commit];
@@ -532,7 +542,7 @@ NS_INLINE NSRange NSMakeRangeToIndex(NSUInteger loc, NSUInteger loc2) {
 }
 
 - (void)reloadData {
-	[self resetDataState];
+    [self setUpInitialState];
 	self.numberOfImages = [self.dataSource numberOfImagesInOpenView:self];
 }
 
@@ -634,13 +644,24 @@ NS_INLINE NSRange NSMakeRangeToIndex(NSUInteger loc, NSUInteger loc2) {
 
 - (void)flipWithView:(UIView*)view
 {
-    AFItem * item = self.selectedCoverView;
     flipView = view;
-    view.frame = [self previewFrameForIndex:item.number];
+
+    AFItem * item = self.selectedCoverView;
+    CGSize fromSize = [self previewFrameForIndex:item.number].size;
+    CGSize toSize = flipView.frame.size;
+    CGFloat fromAR = fromSize.width / fromSize.height;
+    CGFloat toAR = toSize.width / toSize.height;
+    
+    flipInitial = CATransform3DMakeScale(fromSize.width / toSize.width, fromSize.height / toSize.height, 1);
+    flipInitial = CATransform3DRotate(flipInitial, M_PI, 0, 1, 0);
+    flipHeightScale = fromAR / toAR;
+    flipFrontOffset = (fromSize.width / toSize.width - 1.0f) / PERSPECTIVE;
+    
     [self addSubview:flipView];
     flipView.layer.doubleSided = NO;
-    flipView.layer.transform = CATransform3DMakeRotation(M_PI, 0, 1, 0);
     item.imageLayer.doubleSided = NO;
+
+
 
     TPPropertyAnimation *animation = [TPPropertyAnimation propertyAnimationWithKeyPath:@"flipRotation"];
     animation.fromValue = [NSNumber numberWithFloat:0];
@@ -660,6 +681,8 @@ NS_INLINE NSRange NSMakeRangeToIndex(NSUInteger loc, NSUInteger loc2) {
         self.userInteractionEnabled = YES;
         if ([animation.toValue isEqual:[NSNumber numberWithFloat:0]])
         {
+           flipView.layer.transform = CATransform3DIdentity;
+           flipView.layer.zPosition = 0;
            [flipView removeFromSuperview];
            flipView = nil;
            if ([viewDelegate respondsToSelector:@selector(openFlowFlipViewDidEnd:)])
