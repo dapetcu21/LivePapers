@@ -3,6 +3,7 @@
 @protocol LPViewController
 -(void)setWallpaperImage:(UIImage*)img;
 -(void)setWallpaperRect:(CGRect)r;
+-(void)reloadPreferences;
 @end
 @interface LPContainerView : UIView
 {
@@ -129,6 +130,12 @@
 {
     if (vc && [vc respondsToSelector:@selector(setWallpaperRect:)])
         [(LPIntermediateVC<LPViewController>*)vc setWallpaperRect:rect];
+}
+
+-(void)reloadPreferences
+{
+    if (vc && [vc respondsToSelector:@selector(reloadPreferences)])
+        [(LPIntermediateVC<LPViewController>*)vc reloadPreferences];
 }
 
 @end

@@ -100,6 +100,7 @@
 - (void)reloadData; 
 - (void)setSelectedCover:(NSInteger)newSelectedCover;
 - (void)setImage:(UIImage *)image forIndex:(NSInteger)index;
+- (void)setImage:(UIImage *)image forIndex:(NSInteger)index animated:(BOOL)anim;
 - (CGRect)previewFrameForIndex:(NSInteger)index;
 - (void)flipWithView:(UIView*)view;
 

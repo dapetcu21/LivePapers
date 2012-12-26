@@ -19,6 +19,7 @@
 
     NSString * homePaper, * lockPaper;
 
+    LPPaper * flippedPaper;
     LPPreviewView * preview;
     NSTimer * timer;
 }

@@ -12,5 +12,6 @@
 
 -(id)initWithName:(NSString*)name;
 -(LPIntermediateVC*)viewController;
+-(void)reloadPreferences;
 
 @end

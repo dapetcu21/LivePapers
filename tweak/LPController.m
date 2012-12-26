@@ -31,6 +31,7 @@
 		[center retain];
 		[center runServerOnCurrentThread];
 		[center registerForMessageName:LCCenterMessageReload target:self selector:@selector(reloadSettingsWithMessage:userData:)];
+		[center registerForMessageName:LCCenterMessagePrefs target:self selector:@selector(reloadPreferencesWithMessage:userData:)];
     }
     return self;
 }
@@ -68,36 +69,30 @@
     if (loadLock && (!lock || ![lock isKindOfClass:[NSString class]]))
         lock = LCDefaultPaper;
 
-    NSLog(@"home: %@ lock:%@ dict:%@", home, lock, userData);
-
-    if (home)
-        [self setWallpaper:nil forVariant:LPHomeScreenVariant];
-    if (lock)
-        [self setWallpaper:nil forVariant:LPLockScreenVariant];
-
-    BOOL reset[2][2] = {
-        { [walls[0].name isEqual:lock], [walls[0].name isEqual:home]},
-        { [walls[1].name isEqual:lock], [walls[1].name isEqual:home]}
-    };
-
-    int i;
-    for (i = 0; i<2; i++)
-        if (reset[i][0] || reset[i][1])
-            [self setWallpaper:nil forVariant:i];
-    for (i = 0; i<2; i++)
-    {
-        if (reset[i][LPLockScreenVariant])
-            [self setWallpaper:[self wallpaperNamed:lock] forVariant:i];
-        else if (reset[i][LPHomeScreenVariant])
-            [self setWallpaper:[self wallpaperNamed:home] forVariant:i];
-    }
-
     if (home)
         [self setWallpaper:[self wallpaperNamed:home] forVariant:LPHomeScreenVariant];
     if (lock)
         [self setWallpaper:[self wallpaperNamed:lock] forVariant:LPLockScreenVariant];
-
 }
+
+-(void)reloadPreferencesWithMessage:(NSString*)message userData:(NSDictionary*)userData 
+{
+    LPWallpaper * wall = nil;
+    if (userData && [userData isKindOfClass:[NSDictionary class]])
+    {
+        NSString * s = (NSString*)[userData objectForKey:LCCenterUDPrefsItems];
+        LPWallpaper * w = [self wallpaperForVariant:LPHomeScreenVariant];
+        if ([s isEqual:w.name])
+            wall = w;
+        w = [self wallpaperForVariant:LPLockScreenVariant];
+        if ([s isEqual:w.name])
+            wall = w;
+    }
+
+    [wall reloadPreferences];
+}
+
+
 
 -(void)reloadSettings
 {

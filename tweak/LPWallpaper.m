@@ -51,4 +51,9 @@
     return vc;
 }
 
+-(void)reloadPreferences
+{
+    [self.viewController reloadPreferences];
+}
+
 @end

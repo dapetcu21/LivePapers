@@ -13,5 +13,6 @@
 
 -(void)setWallpaperImage:(UIImage*)img;
 -(void)setWallpaperRect:(CGRect)rect;
+-(void)reloadPreferences;
 
 @end

@@ -375,7 +375,17 @@ NS_INLINE NSRange NSMakeRangeToIndex(NSUInteger loc, NSUInteger loc2) {
 	}
 }
 
-- (void)setImage:(UIImage *)image forIndex:(NSInteger)index {
+
+- (void)setImage:(UIImage *)image forIndex:(NSInteger)index
+{
+    [self setImage:image forIndex:index animated:YES];
+}
+- (void)setImage:(UIImage *)image forIndex:(NSInteger)index animated:(BOOL)anim{
+    if (!anim)
+    {
+        [CATransaction begin];
+        [CATransaction setDisableActions:YES];
+    }
 	// Create a reflection for this image.
 	UIImage *imageWithReflection = [image addImageReflection:self.reflectionFraction];
 
@@ -392,6 +402,8 @@ NS_INLINE NSRange NSMakeRangeToIndex(NSUInteger loc, NSUInteger loc2) {
 	if (cover) {
 		[cover setImage:imageWithReflection backingColor:self.backingColor imageScale:scale];
 	}
+    if (!anim)
+        [CATransaction commit];
 	[self layoutCovers];
 }
 
@@ -462,6 +474,10 @@ NS_INLINE NSRange NSMakeRangeToIndex(NSUInteger loc, NSUInteger loc2) {
 - (void)touchesEnded:(NSSet *)touches withEvent:(UIEvent *)event {
     if (flipView)
     {
+        self.userInteractionEnabled = NO;
+        if ([viewDelegate respondsToSelector:@selector(openFlowFlipViewWillEnd:)])
+            [viewDelegate openFlowFlipViewWillEnd:self];
+
         TPPropertyAnimation *animation = [TPPropertyAnimation propertyAnimationWithKeyPath:@"flipRotation"];
         animation.fromValue = [NSNumber numberWithFloat:M_PI];
         animation.toValue = [NSNumber numberWithFloat:0];
@@ -470,7 +486,6 @@ NS_INLINE NSRange NSMakeRangeToIndex(NSUInteger loc, NSUInteger loc2) {
         animation.timing = TPPropertyAnimationTimingEaseInEaseOut;
         [animation beginWithTarget:self];
 
-        self.userInteractionEnabled = NO;
         return;
     }
 	

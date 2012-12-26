@@ -122,27 +122,49 @@
         UIViewController * viewController = paper.preview.prefsViewController;
         if (viewController)
         {
+            flippedPaper = paper;
+            [paper.preview retain];
             [flowView flipWithView:viewController.view];
+
+            [timer invalidate];
+            timer = nil;
+            [self timerFired];
             [self disarmTimer];
         }
     }
 }
 
-- (void)openFlowFlipDidEnd:(AFOpenFlowView*)openFlowView
+- (void)openFlowFlipViewWillEnd:(AFOpenFlowView*)openFlowView
 {
-    NSUInteger index = flowView.selectedCoverView.number;
-    if ((NSUInteger)index < [papers count])
-    {
-        LPPaper * paper = (LPPaper*)[papers objectAtIndex:index];
-        UIViewController * viewController = paper.preview.prefsViewController;
-        if (viewController)
-        {
-            if ([viewController respondsToSelector:@selector(savePreferences)])
-                [viewController performSelector:@selector(savePreferences) withObject:nil afterDelay:0.0f];
-            [self timerFired];
-        }
-    }
+    if (!flippedPaper) return;
 
+    UIViewController * prefsController = flippedPaper.preview.prefsViewController;
+    UIViewController * viewController = flippedPaper.preview.viewController;
+    if ([prefsController respondsToSelector:@selector(savePreferences)])
+        [prefsController performSelector:@selector(savePreferences)];
+    if ([viewController respondsToSelector:@selector(reloadPreferences)])
+        [viewController performSelector:@selector(reloadPreferences)];
+
+    NSDictionary * ud = [NSDictionary dictionaryWithObject:flippedPaper.bundleID forKey:LCCenterUDPrefsItems];
+    [[CPDistributedMessagingCenter centerNamed:LCCenterName] sendMessageName:LCCenterMessagePrefs userInfo:ud];
+
+    preview.paper = flippedPaper;
+    UIImage * img = preview.screenShot;
+    flippedPaper.image = img;
+    [flowView setImage:img forIndex:flippedPaper.index animated:NO];
+}
+
+- (void)screen
+{
+}
+
+
+- (void)openFlowFlipViewDidEnd:(AFOpenFlowView*)openFlowView
+{
+    if (!flippedPaper) return;
+    [self timerFired];
+    [flippedPaper.preview release];
+    flippedPaper = nil;
 }
 
 - (void)selectedPaper:(LPPaper*)p
@@ -295,14 +317,14 @@
 {
     [timer invalidate];
     timer = nil;
-    preview.hidden = YES;
     LPPaper * paper = preview.paper;
     if (paper)
     {
         UIImage * img = preview.screenShot;
         paper.image = img;
-        [flowView setImage:img forIndex:paper.index];
+        [flowView setImage:img forIndex:paper.index animated:NO];
     }
+    preview.hidden = YES;
 }
 
 - (void)timerFired

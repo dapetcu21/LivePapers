@@ -4,6 +4,7 @@
 {
     CGFloat r,g,b;
     NSMutableDictionary * prefs;
+    UISlider * rs, * gs, * bs;
 }
 
 - (void)loadPreferences;
