@@ -18,7 +18,7 @@ LivePapers_FILES = main.m \
     $(OpenFlow_FILES)
 
 LivePapers_OBJCFLAGS = -IOpenFlow/OpenFlow -I. -I../common 
-LivePapers_PRIVATE_FRAMEWORKS = AppSupport
+LivePapers_PRIVATE_FRAMEWORKS = AppSupport SpringBoardUI
 LivePapers_FRAMEWORKS = UIKit CoreGraphics QuartzCore 
 
 include $(THEOS_MAKE_PATH)/application.mk

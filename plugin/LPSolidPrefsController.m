@@ -88,7 +88,6 @@
         nil];
     [prefs setObject:colorArray forKey:LCBuiltinPrefsSolidColor];
     [prefs writeToFile:LCBuiltinPrefsPath atomically:YES];
-    NSLog(@"saveSettings");
 }
 
 - (void)updateBg

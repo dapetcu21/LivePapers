@@ -39,8 +39,7 @@
 
     bar = [[UINavigationBar alloc] initWithFrame:CGRectMake(view.bounds.origin.x, view.bounds.origin.y, r.size.width, 44)];
     [flowView addSubview:bar];
-    if (!iPad)
-        bar.barStyle = UIBarStyleBlack;
+    bar.barStyle = UIBarStyleBlack;
 
     barItem = [[UINavigationItem alloc] init];
     [bar pushNavigationItem:barItem animated:NO];

@@ -51,24 +51,4 @@ UIImage* (*LPGetGradient)(int) = NULL;
     imageView.bounds = r;
 }
 
--(void)viewWillAppear:(BOOL)animated
-{
-    NSLog(@"LivePapers: ---------- viewWillAppear %d", animated);
-}
-
--(void)viewDidAppear:(BOOL)animated
-{
-    NSLog(@"LivePapers: ---------- viewDidAppear %d", animated);
-}
-
--(void)viewDidDisappear:(BOOL)animated
-{
-    NSLog(@"LivePapers: ---------- viewDidDisappear %d", animated);
-}
-
--(void)viewWillDisappear:(BOOL)animated
-{
-    NSLog(@"LivePapers: ---------- viewWillDisappear %d", animated);
-}
-
 @end

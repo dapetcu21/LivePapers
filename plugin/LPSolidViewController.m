@@ -17,7 +17,6 @@
 
 -(void)reloadPreferences
 {
-    NSLog(@"Reload");
     NSArray * colorArray;
     NSNumber * red, * green, * blue;
     CGFloat r,g,b;

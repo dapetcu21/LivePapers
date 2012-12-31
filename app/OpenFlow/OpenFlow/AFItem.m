@@ -46,7 +46,6 @@
 	backingColor:(UIColor *)backingColor 
        imageScale:(CGFloat) scale 
 {
-    NSLog(@"scale %f", scale * newImage.size.width);
 	self.imageLayer.frame = CGRectMake(0, 0, newImage.size.width * scale, newImage.size.height * scale);
 	[self.imageLayer setContents:(id)[newImage CGImage]];
 	self.imageLayer.name = @"Image Layer";

@@ -11,10 +11,10 @@
 @implementation LPPreviewView
 @synthesize fullScreenFrame;
 
-UIImage * SBWallpaperGradientImageForInterfaceOrientation(int orient)
+/*UIImage * SBWallpaperGradientImageForInterfaceOrientation(int orient)
 {
     return nil;
-}
+}*/
 
 - (id)initWithFrame:(CGRect)frame
 {
@@ -28,14 +28,16 @@ UIImage * SBWallpaperGradientImageForInterfaceOrientation(int orient)
     return self;
 }
 
+UIImage * SBWallpaperImageForVariant(int);
+
 - (void)setViewControllerImage
 {
     UIViewController<LPViewController> * vc = (UIViewController<LPViewController>*)paper.preview.viewController;
     if (!vc) return;
     if ([vc respondsToSelector:@selector(setWallpaperImage:)])
     {
-        NSString * path = [NSString stringWithFormat:@"/Library/Wallpaper/%@/default.png", [UIDevice currentDevice].model];
-        [vc setWallpaperImage:[UIImage imageWithContentsOfFile:path]];
+//        NSString * path = [NSString stringWithFormat:@"/Library/Wallpaper/%@/default.png", [UIDevice currentDevice].model];
+        [vc setWallpaperImage:SBWallpaperImageForVariant(1)];
     }
 }
 
