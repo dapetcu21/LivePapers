@@ -2,12 +2,12 @@
 {
     NSString * name;
     void * lib;
-    UIViewController * (*fcn)(NSObject*);
+    UIViewController * (*fcn)(NSDictionary*);
 }
 
 @property(nonatomic, readonly) NSString * name;
 
 -(id)initWithName:(NSString*)name;
--(UIViewController*)newViewController:(NSObject*)ud;
+-(UIViewController*)newViewController:(NSDictionary*)info;
 
 @end

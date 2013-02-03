@@ -266,6 +266,8 @@
 {
     NSAutoreleasePool * pool = [NSAutoreleasePool new];
     UIImage * img = [UIImage imageWithContentsOfFile: [NSString stringWithFormat:@"/%@/%@/Default.png", LCWallpapersPath, p.bundleID]];
+    if (!img)
+        img = defaultImage;
     [self performSelectorOnMainThread:@selector(imageLoadedForPaper:) withObject:[NSArray arrayWithObjects: p, img, nil] waitUntilDone:NO];
     [pool drain];
 }

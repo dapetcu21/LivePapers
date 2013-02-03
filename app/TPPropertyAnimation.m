@@ -9,7 +9,8 @@
 #import "TPPropertyAnimation.h"
 #import <QuartzCore/QuartzCore.h>
 
-#define kRefreshRate 1.0/30.0
+//#define kRefreshRate (1.0/60.0)
+#define kRefreshRate 0.0f
 
 // Storage for singleton manager
 @class TPPropertyAnimationManager;

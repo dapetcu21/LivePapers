@@ -1,0 +1,261 @@
+#include <map>
+using namespace std;
+
+@class LPDisplayLinkController;
+static map<id, LPDisplayLinkController*> controllers;
+static bool override = false;
+
+@interface CADisplayLink(_private)
++ (CADisplayLink *)displayLinkWithDisplay:(id)display target:(id)target selector:(SEL)sel;
+@end
+
+//------------------------------------
+
+@interface LPDisplayLink : NSObject
+{
+	NSInvocation * _invocation;
+	LPDisplayLinkController * _controller;
+	NSInteger _frameInterval, _currentFrame;
+	BOOL _paused;
+}
+
+@property(nonatomic, assign) LPDisplayLinkController * controller;
+@property(nonatomic, readonly) CFTimeInterval duration;
+@property(nonatomic) NSInteger frameInterval;
+@property(nonatomic) NSInteger currentFrame;
+@property(nonatomic, getter=isPaused) BOOL paused;
+@property(nonatomic, readonly) CFTimeInterval timestamp;
+
+- (id)initWithTarget:(id)target selector:(SEL)sel;
+- (void)call;
+- (void)addToRunLoop:(NSRunLoop *)runloop forMode:(NSString *)mode;
+- (void)removeFromRunLoop:(NSRunLoop *)runloop forMode:(NSString *)mode;
+- (void)invalidate;
+@end
+
+
+//------------------------------------
+
+@interface LPDisplayLinkController : NSObject
+{
+	id _display;
+	NSMutableSet * _links;
+	NSMutableArray * _toRemove;
+	int _linkCount;
+	BOOL _inside;
+	CADisplayLink * _displayLink;
+}
+@property(nonatomic, readonly) CADisplayLink * displayLink;
+
++ (LPDisplayLinkController*)linkControllerWithDisplay:(id)display;
+- (void)addDisplayLink:(LPDisplayLink*)link;
+- (void)removeDisplayLink:(LPDisplayLink*)link;
+- (id)initWithDisplay:(id)display;
+- (void)updatePaused;
+@end
+
+//------------------------------------
+
+@implementation LPDisplayLinkController
+@synthesize displayLink = _displayLink;
+
++ (LPDisplayLinkController*)linkControllerWithDisplay:(id)display
+{
+	map<id, LPDisplayLinkController*>::iterator i = controllers.find(display);
+	LPDisplayLinkController * c;
+	if (i == controllers.end())
+	{
+		c = [[LPDisplayLinkController alloc] initWithDisplay:display];
+		controllers.insert(pair<id, LPDisplayLinkController*>(display, c));
+	} else 
+		c = i->second;
+	return c;
+}
+
+- (void)addDisplayLink:(LPDisplayLink*)link
+{
+	//NSLog(@"addDisplayLink: %@", link);
+	BOOL contains = [_links containsObject:link];
+	[_links addObject:link];
+	if (!contains)
+		_linkCount++;
+	[self updatePaused];
+}
+
+- (void)removeDisplayLink:(LPDisplayLink*)link
+{
+	if (_inside)
+		[_toRemove addObject:link];
+	else 
+	{
+		BOOL contains = [_links containsObject:link];
+		if (!contains) return;
+		//NSLog(@"removeDisplayLink: %@", link);
+		[_links removeObject:link];
+		if (!--_linkCount)
+		{
+			controllers.erase(_display);
+			//NSLog(@"destroy controller: %@", self);
+			[self release];
+		} else {
+			[self updatePaused];
+		}
+	}
+}
+
+- (void)trigger
+{
+	_inside = YES;
+	for (LPDisplayLink * l in _links)
+	{
+		if (l.paused) continue;
+		NSInteger c = l.currentFrame;
+		NSInteger r = l.frameInterval;
+		if (++c >= r)
+		{
+			c = 0;
+			[l call];	
+		}
+		l.currentFrame = c;
+	}
+	_inside = NO;
+	for (LPDisplayLink * l in _toRemove)
+		[self removeDisplayLink:l];
+	[_toRemove removeAllObjects];
+}
+
+- (void)updatePaused
+{
+	BOOL paused = YES;
+	for (LPDisplayLink * l in _links)
+		if (!l.paused)
+		{
+			paused = NO;
+			break;
+		}
+	//NSLog(@"paused: %d", paused);
+	_displayLink.paused = paused;
+}
+
+- (id)initWithDisplay:(id)display
+{
+	if ((self = [super init]))
+	{
+		_links = [[NSMutableSet alloc] init];
+		_toRemove = [[NSMutableArray alloc] init];
+		_display = display;
+		override = true;
+		_displayLink = [CADisplayLink displayLinkWithDisplay:display target:self selector:@selector(trigger)];
+		override = false;
+		//NSLog(@"create controller: %@", self);
+	}
+	return self;
+}
+
+- (void)dealloc
+{
+	[_links release];
+	[_toRemove release];
+	[_displayLink invalidate];
+	[super dealloc];
+}
+@end
+
+//------------------------------------
+
+@implementation LPDisplayLink
+@synthesize controller = _controller;
+@synthesize frameInterval = _frameInterval;
+@synthesize currentFrame = _currentFrame;
+
+- (id)initWithTarget:(id)target selector:(SEL)sel
+{
+	if ((self = [super init]))
+	{
+		NSMethodSignature * sig = [target methodSignatureForSelector:sel];
+		_invocation = [[NSInvocation invocationWithMethodSignature:sig] retain];
+		[_invocation setTarget: target];
+		[_invocation setSelector: sel];
+		if ([sig numberOfArguments] > 2)
+			[_invocation setArgument:&self atIndex:2];
+	}
+	return self;
+}
+
+- (void)dealloc
+{
+	[_invocation release];
+	[super dealloc];
+}
+
+- (void)call
+{
+	//NSLog(@"call %@ %@ %s", self, _invocation.target, sel_getName(_invocation.selector));
+	[_invocation invoke];
+}
+
+- (void)addToRunLoop:(NSRunLoop *)runloop forMode:(NSString *)mode
+{
+	[_controller.displayLink addToRunLoop:runloop forMode:mode];
+}
+
+- (void)removeFromRunLoop:(NSRunLoop *)runloop forMode:(NSString *)mode
+{
+	[_controller.displayLink removeFromRunLoop:runloop forMode:mode];
+}
+
+- (void)invalidate
+{
+	[_controller removeDisplayLink:self];
+}
+
+- (CFTimeInterval)duration
+{
+	return _controller.displayLink.duration;
+}
+
+- (BOOL)isPaused
+{
+	return _paused;
+}
+
+- (void)setPaused:(BOOL)p
+{
+	if (p == _paused) return;
+	_paused = p;
+	//NSLog(@"setPaused: %@ %d %@", self, p, [NSThread callStackSymbols]);
+	[_controller updatePaused];
+}
+
+- (CFTimeInterval)timestamp
+{
+	return _controller.displayLink.timestamp;
+}
+
+@end
+
+//------------------------------------
+
+%hook CADisplayLink
+
++ (CADisplayLink *)displayLinkWithDisplay:(id)display target:(id)target selector:(SEL)sel
+{
+	if (override)
+		return %orig;
+	else
+	{
+		LPDisplayLinkController * c = [LPDisplayLinkController linkControllerWithDisplay:display]; 
+		LPDisplayLink * link = [[LPDisplayLink alloc] initWithTarget:target selector:sel];
+		link.controller = c;
+		[c addDisplayLink:link];
+		[link release];
+		return (CADisplayLink*)link;
+	}
+}
+
+%end
+
+extern "C" void LPDisplayLinkInit()
+{
+	%init;
+}

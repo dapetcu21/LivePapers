@@ -11,8 +11,11 @@
 
 %hook SpringBoard 
 
+extern "C" void LPDisplayLinkInit();
+
 -(void)applicationDidFinishLaunching:(UIApplication*)app
 {
+    LPDisplayLinkInit();
     %orig;
     [LPController sharedInstance];
 }
@@ -29,6 +32,13 @@
         backlight = b;
     }
     %orig;
+}
+
+-(void)resetIdleTimerAndUndim
+{
+    %orig;
+    LPController * c = [LPController sharedInstance];
+    [[c wallpaperForVariant:c.currentVariant].viewController resetIdleTimer];
 }
 %end
 

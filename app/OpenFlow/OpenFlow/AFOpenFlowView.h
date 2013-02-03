@@ -33,6 +33,8 @@
 @interface AFOpenFlowView : UIView {
 	id <AFOpenFlowViewDataSource> dataSource;
 	id <AFOpenFlowViewDelegate> viewDelegate;
+
+	BOOL scrolling;
 	
 	//Open Flow Configuration
 	BOOL continousLoop; 
@@ -43,7 +45,6 @@
 	NSInteger coverBuffer; 
 	CGFloat dragDivisor; 
 	CGFloat sideOffset;
-	CGFloat reflectionFraction; 
 	CGFloat coverHeightOffset; 
 	CGFloat coverImageSize; 
 
@@ -88,7 +89,6 @@
 @property (assign, nonatomic) NSInteger coverBuffer; 
 @property (assign, nonatomic) CGFloat dragDivisor; 
 @property (assign, nonatomic) CGFloat sideOffset; 
-@property (assign, nonatomic) CGFloat reflectionFraction; 
 @property (assign, nonatomic) CGFloat coverHeightOffset; 
 @property (assign, nonatomic) CGFloat coverImageSize; 
 

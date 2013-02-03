@@ -3,8 +3,9 @@
 #import "LPSolidViewController.h"
 #import "LPSolidPrefsController.h"
 
-UIViewController * LPInitViewController(NSObject * ud)
+UIViewController * LPInitViewController(NSDictionary * info)
 {
+    NSString * ud = [info objectForKey:@"LCInitUserData"];
     if ([ud isEqual:@"Default"])
     {
         return [[LPDefaultViewController alloc] init];
@@ -16,8 +17,9 @@ UIViewController * LPInitViewController(NSObject * ud)
     return nil;
 }
 
-UIViewController * LPInitPrefsViewController(NSObject * ud)
+UIViewController * LPInitPrefsViewController(NSDictionary * info)
 {
+    NSString * ud = [info objectForKey:@"LCInitUserData"];
     if ([ud isEqual:@"Solid"])
     {
         return [[LPSolidPrefsController alloc] init];

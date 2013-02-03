@@ -58,28 +58,44 @@ CGRect (*LPWallpaperContentsRectForAspectFill)(CGSize, CGRect);
     if (h)
         self.hidden = NO;
 
-    CGRect rect = [self bounds];
-    UIGraphicsBeginImageContextWithOptions(rect.size,self.opaque,0.0f);
-    CGContextRef context = UIGraphicsGetCurrentContext();
-    [self.layer renderInContext:context];   
-    UIImage * img = UIGraphicsGetImageFromCurrentImageContext();
+    UIImage * img;
+
+    if ([vc knowsScreenShot])
+        img = [vc screenShot];
+    else {
+        CGRect rect = [self bounds];
+        UIGraphicsBeginImageContextWithOptions(rect.size,self.opaque,0.0f);
+        CGContextRef context = UIGraphicsGetCurrentContext();
+        [self.layer renderInContext:context];   
+        img = UIGraphicsGetImageFromCurrentImageContext();
+        UIGraphicsEndImageContext();
+    }
+    
     if (img)
     {
         [img retain];
         [screen release];
         screen = img;
     }
-    UIGraphicsEndImageContext();
 
     if (h)
         self.hidden = YES;
     return screen;
 }
 
+-(void)resetScreenCount
+{
+    alreadyScreened = NO;
+}
+
 -(UIImage*)image
 {
-    if (vc && (vc.view.superview == self))
+    if (vc && (vc.view.superview == self) && !alreadyScreened)
+    {
         [self screenshot];
+        alreadyScreened = YES;
+        [self performSelector:@selector(resetScreenCount) withObject:nil afterDelay:0];
+    }
     return screen;
 }
 

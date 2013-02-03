@@ -16,17 +16,17 @@
 {
     if ((self = [super init]))
     {
-        dict = [[NSDictionary dictionaryWithContentsOfFile:
-            [NSString stringWithFormat:@"/%@/%@/Info.plist", LCWallpapersPath, path]] retain];
-        bundleID = [path retain];
-        name = [[NSString stringWithString:[dict objectForKey:@"Name"]] retain];
-        plugin = [[NSString stringWithString:[dict objectForKey:@"Plugin"]] retain];
-        userData = [[dict objectForKey:@"User Data"] retain];
-        hasSettings = [(NSNumber*)[dict objectForKey:@"Has Settings"] boolValue];
+        @try {
+            dict = [[NSDictionary dictionaryWithContentsOfFile:
+                [NSString stringWithFormat:@"%@/%@/Info.plist", LCWallpapersPath, path]] retain];
+            NSAssert(dict, @"No such file");
+            bundleID = [path retain];
+            name = [[NSString stringWithString:[dict objectForKey:@"Name"]] retain];
+            plugin = [[NSString stringWithString:[dict objectForKey:@"Plugin"]] retain];
+            userData = [[dict objectForKey:@"User Data"] retain];
+            hasSettings = [(NSNumber*)[dict objectForKey:@"Has Settings"] boolValue];
 
-        NSLog(@"hasSettings %d", hasSettings);
-        if (!dict || !plugin || !name)
-        {
+        } @catch(...) {
             [self release];
             return nil;
         }

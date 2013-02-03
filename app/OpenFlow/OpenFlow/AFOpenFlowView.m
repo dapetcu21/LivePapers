@@ -24,7 +24,6 @@
  */
 #import "AFOpenFlowView.h"
 #import "AFOpenFlowConstants.h"
-#import "AFUIImageReflection.h"
 #import "TPPropertyAnimation.h"
 
 #define PERSPECTIVE (-0.002f)
@@ -89,7 +88,6 @@
 @synthesize sideCoverZPosition; 
 @synthesize coverBuffer; 
 @synthesize dragDivisor; 
-@synthesize reflectionFraction; 
 @synthesize coverHeightOffset; 
 @synthesize coverImageSize; 
 @synthesize sideOffset;
@@ -162,7 +160,6 @@ NS_INLINE NSRange NSMakeRangeToIndex(NSUInteger loc, NSUInteger loc2) {
 	self.sideCoverZPosition = SIDE_COVER_ZPOSITION;
 	self.coverBuffer = COVER_BUFFER;
 	self.dragDivisor = DRAG_DIVISOR;
-	self.reflectionFraction = REFLECTION_FRACTION;
 	self.coverHeightOffset = COVER_HEIGHT_OFFSET;
 	self.coverImageSize = COVER_IMAGE_SIZE; //TODO: Check this might not be used. 
 
@@ -376,12 +373,10 @@ NS_INLINE NSRange NSMakeRangeToIndex(NSUInteger loc, NSUInteger loc2) {
 - (void)setDefaultImage:(UIImage *)newDefaultImage {
 	if (newDefaultImage != defaultImage) {
 		defaultImageHeight = newDefaultImage.size.height;
-		if (newDefaultImage) {
-			defaultImage = [[newDefaultImage addImageReflection:self.reflectionFraction] retain];
-		} else {
-			[defaultImage release]; 
-			defaultImage = nil; 
-		}
+
+        [newDefaultImage retain];
+        [defaultImage release];
+        defaultImage = newDefaultImage;
 	}
 }
 
@@ -396,8 +391,6 @@ NS_INLINE NSRange NSMakeRangeToIndex(NSUInteger loc, NSUInteger loc2) {
         [CATransaction begin];
         [CATransaction setDisableActions:YES];
     }
-	// Create a reflection for this image.
-	UIImage *imageWithReflection = [image addImageReflection:self.reflectionFraction];
 
     CGFloat w = image.size.width;
     CGFloat h = image.size.height;
@@ -410,7 +403,7 @@ NS_INLINE NSRange NSMakeRangeToIndex(NSUInteger loc, NSUInteger loc2) {
 
 	AFItem *cover = [self coverForIndex:index];
 	if (cover) {
-		[cover setImage:imageWithReflection backingColor:self.backingColor imageScale:scale];
+		[cover setImage:image backingColor:self.backingColor imageScale:scale];
 	}
     if (!anim)
         [CATransaction commit];
@@ -440,14 +433,20 @@ NS_INLINE NSRange NSMakeRangeToIndex(NSUInteger loc, NSUInteger loc2) {
 	
 	selectedCoverAtDragStart = selectedCoverView.number;
 
-    if ([self.viewDelegate respondsToSelector:@selector(openFlowViewScrollingDidBegin:)]) {
-        [self.viewDelegate openFlowViewScrollingDidBegin:self];
-	}
+    scrolling = NO;
 }
 
 
 - (void)touchesMoved:(NSSet *)touches withEvent:(UIEvent *)event {
     if (flipView) return;
+
+    if (!scrolling)
+    {
+        scrolling = YES;
+    if ([self.viewDelegate respondsToSelector:@selector(openFlowViewScrollingDidBegin:)]) {
+        [self.viewDelegate openFlowViewScrollingDidBegin:self];
+        }
+    }
 
 	isSingleTap = NO;
 	isDoubleTap = NO;
@@ -531,12 +530,20 @@ NS_INLINE NSRange NSMakeRangeToIndex(NSUInteger loc, NSUInteger loc2) {
             }   
             
         }    
-    } 	
+    } else {
+        if (!scrolling)
+        {
+            scrolling = YES;
+        if ([self.viewDelegate respondsToSelector:@selector(openFlowViewScrollingDidBegin:)]) {
+            [self.viewDelegate openFlowViewScrollingDidBegin:self];
+            }
+        }
+    }
 
 	[self layoutCovers];
 	
     // End of scrolling 
-    if ([self.viewDelegate respondsToSelector:@selector(openFlowViewScrollingDidEnd:)]) {
+    if (scrolling && [self.viewDelegate respondsToSelector:@selector(openFlowViewScrollingDidEnd:)]) {
         [self.viewDelegate openFlowViewScrollingDidEnd:self];    
 	}
 }

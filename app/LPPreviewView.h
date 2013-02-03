@@ -7,6 +7,8 @@
     LPPaper * paper;
     UIView * view;
     BOOL fullScreen;
+
+    NSTimer * timer;
 }
 
 - (id)initWithFrame:(CGRect)frame;

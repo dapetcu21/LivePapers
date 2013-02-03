@@ -11,10 +11,13 @@
     NSMutableDictionary * plugins, * papers;
     LPWallpaper * walls[2];
     CPDistributedMessagingCenter * center;
+
+    int currentVariant;
 }
 
 @property(nonatomic, assign) LPView * view;
 @property(nonatomic, assign) LPView * lockView;
+@property(nonatomic, readonly) int currentVariant;
 
 +(LPController*)sharedInstance;
 

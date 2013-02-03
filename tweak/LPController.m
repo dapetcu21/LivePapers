@@ -10,19 +10,22 @@
 
 @implementation LPController
 @synthesize view;
+@synthesize currentVariant;
+
+static LPController * LPControllerSharedInstance = nil;
 
 +(LPController*)sharedInstance
 {
-    static LPController * l = nil;
-    if (!l)
-        l = [LPController new];
-    return l;
+    if (!LPControllerSharedInstance)
+        LPControllerSharedInstance = [LPController new];
+    return LPControllerSharedInstance;
 }
 
 -(id)init
 {
     if ((self = [super init]))
     {
+        LPControllerSharedInstance = self;
         plugins = [[NSMutableDictionary alloc] init];
         papers = [[NSMutableDictionary alloc] init];
         [self reloadSettings];
@@ -138,6 +141,12 @@
 
 -(void)setWallpaper:(LPWallpaper*)wall forVariant:(int)var
 {
+    if (wall != walls[var])
+    {
+        [wall.viewController setActive:YES forVariant:var];
+        [walls[var].viewController setActive:NO forVariant:var];
+    }
+
     [wall retain];
     [walls[var] release];
     walls[var] = wall;
@@ -160,6 +169,10 @@
 
 -(void)setLockView:(LPView*)v
 {
+    currentVariant = v ? 0 : 1;
+    walls[0].viewController.currentVariant = currentVariant;
+    walls[1].viewController.currentVariant = currentVariant;
+
     if (lockView && !v && view && walls[1] && (walls[1] == walls[0]))
         view.wallpaper = walls[1];
     lockView = v;

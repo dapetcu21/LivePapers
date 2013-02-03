@@ -1,18 +1,32 @@
 {
-    CFBundleExecutable = "LivePapers";
-    CFBundleIconFile = icon.png;
-    CFBundleIdentifier = "org.porkholt.LivePapers";
-    CFBundleInfoDictionaryVersion = 6.0;
-    CFBundlePackageType = APPL;
-    CFBundleSignature = "????";
-    CFBundleSupportedPlatforms = (
-	iPhoneOS
-    );
-    UIDeviceFamily = ( 1, 2 );
-    CFBundleVersion = 1.0;
-    DTPlatformName = iphoneos;
-    DTSDKName = iphoneos3.0;
-    LSRequiresIPhoneOS = 1;
-    MinimumOSVersion = 3.0;
-    UIApplicationExitsOnSuspend = true;
+	CFBundleExecutable = LivePapers;
+	CFBundleIdentifier = "org.porkholt.LivePapers";
+	"CFBundleInfoDictionaryVersion" = "6.0";
+	CFBundlePackageType = APPL;
+	CFBundleIcons = {
+		CFBundlePrimaryIcon = {
+			CFBundleIconFiles = (
+				"Icon.png",
+				"Icon@2x.png",
+				"Icon-72.png",
+				"Icon-72@2x.png",
+			);
+			UIPrerenderedIcon = YES;
+		};
+	};
+	CFBundleSignature = "????";
+	"CFBundleSupportedPlatforms" = (
+		iPhoneOS,
+	);
+	UIDeviceFamily = (
+		1,
+		2,
+	);
+	CFBundleVersion = "1.0";
+	DTPlatformName = iphoneos;
+	DTSDKName = "iphoneos3.0";
+	LSRequiresIPhoneOS = 1;
+	MinimumOSVersion = "3.0";
+	"UIApplicationExitsOnSuspend" = 1;
+	UIPrerenderedIcon = YES;
 }

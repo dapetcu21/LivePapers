@@ -50,7 +50,6 @@
 	[self.imageLayer setContents:(id)[newImage CGImage]];
 	self.imageLayer.name = @"Image Layer";
 	self.imageLayer.backgroundColor = [backingColor CGColor];
-    [CATransaction commit];
 }
 
 - (NSString *)description {

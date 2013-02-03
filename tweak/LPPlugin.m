@@ -45,9 +45,9 @@
     [super dealloc];
 }
 
--(UIViewController*)newViewController:(NSObject*)ud
+-(UIViewController*)newViewController:(NSDictionary*)info
 {
-    return fcn(ud);
+    return fcn(info);
 }
 
 @end

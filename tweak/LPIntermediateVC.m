@@ -4,6 +4,7 @@
 -(void)setWallpaperImage:(UIImage*)img;
 -(void)setWallpaperRect:(CGRect)r;
 -(void)reloadPreferences;
+-(UIImage*)screenShot;
 @end
 @interface LPContainerView : UIView
 {
@@ -17,6 +18,7 @@
     if ((self = [super init]))
     {
         v = _v;
+        self.userInteractionEnabled = YES;
         [self addSubview:v];
     }
     return self;
@@ -76,21 +78,46 @@
     return viewShowing;
 }
 
+-(int)currentVariant
+{
+    return currentVariant;
+}
+
+#define getMask() (screenLit && viewShowing && active[currentVariant])
+
 -(void)setScreenLit:(BOOL)v
 {
     if (v!=screenLit)
     {
-        BOOL om = screenLit && viewShowing;
+        BOOL om = getMask();
         screenLit = v;
         [self updateWithOldMask: om];
     }
+}
+
+-(void)setCurrentVariant:(int)var
+{
+    if (var!=currentVariant)
+    {
+        BOOL om = getMask();
+        currentVariant = var;
+        [self updateWithOldMask: om];
+    }
+}
+
+-(void)setActive:(BOOL)a forVariant:(int)var
+{
+    if (active[var] == a) return;
+    BOOL om = getMask();
+    active[var] = a;
+    [self updateWithOldMask: om];
 }
 
 -(void)setViewShowing:(BOOL)v
 {
     if (v!=viewShowing)
     {
-        BOOL om = screenLit && viewShowing;
+        BOOL om = getMask();
         viewShowing = v;
         [self updateWithOldMask: om];
     }
@@ -98,7 +125,7 @@
 
 -(void)updateWithOldMask:(BOOL)m
 {
-    BOOL mask = screenLit && viewShowing;
+    BOOL mask = getMask();
     if (mask == m) return;
     if (mask)
     {
@@ -136,6 +163,25 @@
 {
     if (vc && [vc respondsToSelector:@selector(reloadPreferences)])
         [(LPIntermediateVC<LPViewController>*)vc reloadPreferences];
+}
+
+-(void)resetIdleTimer
+{
+    if (vc && [vc respondsToSelector:@selector(resetIdleTimer)])
+        [(LPIntermediateVC<LPViewController>*)vc resetIdleTimer];
+}
+
+
+-(BOOL)knowsScreenShot
+{
+    return (vc && [vc respondsToSelector:@selector(screenShot)]);
+}
+
+-(UIImage*)screenShot
+{
+    if ([self knowsScreenShot])
+        return [(LPIntermediateVC<LPViewController>*)vc screenShot];
+    return nil;
 }
 
 @end

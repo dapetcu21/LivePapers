@@ -1,6 +1,7 @@
 #import "LPPreview.h"
 #import "LPPaper.h"
 #import "LPPlugin.h"
+#import "LPCommon.h"
 
 @interface LPPaper(LPPreviewExt)
 - (void)setPreview:(LPPreview*)p;
@@ -23,9 +24,17 @@
     if ((self = [super init]))
     {
         paper = p; 
+        initInfo = [[NSDictionary alloc] initWithObjectsAndKeys:
+            paper.name, LCInitName,
+            paper.bundleID, LCInitBundleID,
+            [NSString stringWithFormat:@"%@/%@", LCWallpapersPath, paper.bundleID] , LCInitWallpaperPath,
+            [NSNumber numberWithBool:YES], LCInitIsPreview,
+            paper.userData, LCInitUserData,
+            nil];
+
         @try {
         plugin = [[LPPlugin alloc] initWithName:paper.plugin];
-        viewController = [plugin viewControllerWithUserInfo:paper.userData];
+        viewController = [plugin viewControllerWithUserInfo:initInfo];
         } @catch(NSException * ex)
         {
             NSLog(@"Caught exception %@", ex);
@@ -40,7 +49,7 @@
     {
         triedLoadingPrefs = YES;
         @try {
-        prefsViewController = [plugin preferencesViewControllerWithUserInfo:paper.userData];
+        prefsViewController = [plugin preferencesViewControllerWithUserInfo:initInfo];
         } @catch(NSException * ex)
         {
             NSLog(@"Caught exception %@", ex);
@@ -51,6 +60,7 @@
 
 - (void)dealloc
 {
+    [initInfo release];
     [paper setPreview:nil];
     [viewController release];
     [prefsViewController release];

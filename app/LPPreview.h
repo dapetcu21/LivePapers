@@ -5,6 +5,7 @@
 {
     LPPlugin * plugin;
     LPPaper * paper;
+    NSDictionary * initInfo;
     UIViewController * viewController;
     UIViewController * prefsViewController;
     BOOL triedLoadingPrefs;

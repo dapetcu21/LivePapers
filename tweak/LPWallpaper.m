@@ -34,8 +34,18 @@
             NSDictionary * info = [NSDictionary dictionaryWithContentsOfFile:[NSString stringWithFormat:@"%@/%@/Info.plist", LCWallpapersPath, name]];
             NSString * pluginName = [NSString stringWithString:[info objectForKey:@"Plugin"]];
             NSObject * ud = [info objectForKey:@"User Data"];
+            NSString * displayName = [info objectForKey:@"Name"];
+            NSString * path = [NSString stringWithFormat:@"%@/%@", LCWallpapersPath, name];
+            NSDictionary * initInfo = [NSDictionary dictionaryWithObjectsAndKeys:
+                displayName, LCInitName,
+                name, LCInitBundleID,
+                path, LCInitWallpaperPath,
+                [NSNumber numberWithBool:NO], LCInitIsPreview,
+                ud, LCInitUserData,
+                nil];
+
             plugin = [[[LPController sharedInstance] pluginNamed:pluginName] retain];
-            UIViewController * v = [plugin newViewController:ud];
+            UIViewController * v = [plugin newViewController:initInfo];
             vc = [[LPIntermediateVC alloc] initWithViewController:v];
             [v release];
         }

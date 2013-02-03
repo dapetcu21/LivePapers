@@ -22,12 +22,7 @@
 
 -(void)drawRect:(CGRect)rect
 {
-    bool h = master.hidden;
-    if (h)
-        master.hidden = NO;
-    [master.layer renderInContext:UIGraphicsGetCurrentContext()];
-    if (h)
-        master.hidden = YES;
+    [[master image] drawInRect:self.bounds];
 }
 
 //-- SBWallpaperView interface

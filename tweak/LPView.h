@@ -11,6 +11,7 @@
     UIImage * screen;
     UIImageView * shotView;
     CGRect imageRect;
+    BOOL alreadyScreened;
 }
 
 @property(nonatomic, assign) int orientation;
