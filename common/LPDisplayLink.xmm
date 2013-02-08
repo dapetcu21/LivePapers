@@ -52,6 +52,7 @@ static bool override = false;
 - (void)removeDisplayLink:(LPDisplayLink*)link;
 - (id)initWithDisplay:(id)display;
 - (void)updatePaused;
+- (void)invalidate;
 @end
 
 //------------------------------------
@@ -74,7 +75,6 @@ static bool override = false;
 
 - (void)addDisplayLink:(LPDisplayLink*)link
 {
-	//NSLog(@"addDisplayLink: %@", link);
 	BOOL contains = [_links containsObject:link];
 	[_links addObject:link];
 	if (!contains)
@@ -90,13 +90,11 @@ static bool override = false;
 	{
 		BOOL contains = [_links containsObject:link];
 		if (!contains) return;
-		//NSLog(@"removeDisplayLink: %@", link);
 		[_links removeObject:link];
 		if (!--_linkCount)
 		{
 			controllers.erase(_display);
-			//NSLog(@"destroy controller: %@", self);
-			[self release];
+            [self invalidate];
 		} else {
 			[self updatePaused];
 		}
@@ -133,7 +131,6 @@ static bool override = false;
 			paused = NO;
 			break;
 		}
-	//NSLog(@"paused: %d", paused);
 	_displayLink.paused = paused;
 }
 
@@ -146,17 +143,26 @@ static bool override = false;
 		_display = display;
 		override = true;
 		_displayLink = [CADisplayLink displayLinkWithDisplay:display target:self selector:@selector(trigger)];
+        [_displayLink retain];
 		override = false;
-		//NSLog(@"create controller: %@", self);
 	}
 	return self;
 }
 
-- (void)dealloc
+- (void)invalidate
 {
+	[_displayLink invalidate];
+    [_displayLink release];
 	[_links release];
 	[_toRemove release];
-	[_displayLink invalidate];
+    _toRemove = nil;
+    _links = nil;
+    _displayLink = nil;
+}
+
+- (void)dealloc
+{
+    [self invalidate];
 	[super dealloc];
 }
 @end
@@ -172,6 +178,7 @@ static bool override = false;
 {
 	if ((self = [super init]))
 	{
+        [target retain];
 		NSMethodSignature * sig = [target methodSignatureForSelector:sel];
 		_invocation = [[NSInvocation invocationWithMethodSignature:sig] retain];
 		[_invocation setTarget: target];
@@ -184,13 +191,13 @@ static bool override = false;
 
 - (void)dealloc
 {
+    [_invocation.target release];
 	[_invocation release];
 	[super dealloc];
 }
 
 - (void)call
 {
-	//NSLog(@"call %@ %@ %s", self, _invocation.target, sel_getName(_invocation.selector));
 	[_invocation invoke];
 }
 
@@ -207,6 +214,7 @@ static bool override = false;
 - (void)invalidate
 {
 	[_controller removeDisplayLink:self];
+    _controller = nil;
 }
 
 - (CFTimeInterval)duration
@@ -223,7 +231,6 @@ static bool override = false;
 {
 	if (p == _paused) return;
 	_paused = p;
-	//NSLog(@"setPaused: %@ %d %@", self, p, [NSThread callStackSymbols]);
 	[_controller updatePaused];
 }
 

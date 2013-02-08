@@ -19,6 +19,12 @@
 @synthesize context = _context;
 @synthesize bundle = _bundle;
 
+-(void)_createDisplayLinkForScreen:(id)screen
+{
+    [super _createDisplayLinkForScreen:screen];
+    [self.displayLink addToRunLoop:[NSRunLoop mainRunLoop] forMode:NSRunLoopCommonModes];
+}
+
 -(void)loadView
 {
     if (!_bundle)

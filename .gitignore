@@ -12,4 +12,7 @@ xcuserdata
 *.swp
 *~
 
+/app/common
+/tweak/common
+
 .DS_Store

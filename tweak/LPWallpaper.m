@@ -40,6 +40,7 @@
                 displayName, LCInitName,
                 name, LCInitBundleID,
                 path, LCInitWallpaperPath,
+                [NSString stringWithFormat:@"%@/%@.dylib", LCPluginsPath, pluginName], LCInitPluginPath,
                 [NSNumber numberWithBool:NO], LCInitIsPreview,
                 ud, LCInitUserData,
                 nil];

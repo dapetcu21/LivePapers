@@ -30,6 +30,7 @@
 #define LCInitBundleID @"LCInitBundleID"
 #define LCInitUserData @"LCInitUserData"
 #define LCInitWallpaperPath @"LCInitWallpaperPath"
+#define LCInitPluginPath @"LCInitPluginPath"
 #define LCInitIsPreview @"LCInitIsPreview"
 
 #endif

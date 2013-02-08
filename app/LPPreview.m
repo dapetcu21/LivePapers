@@ -28,6 +28,7 @@
             paper.name, LCInitName,
             paper.bundleID, LCInitBundleID,
             [NSString stringWithFormat:@"%@/%@", LCWallpapersPath, paper.bundleID] , LCInitWallpaperPath,
+            [NSString stringWithFormat:@"%@/%@.dylib", LCPluginsPath, paper.plugin], LCInitPluginPath,
             [NSNumber numberWithBool:YES], LCInitIsPreview,
             paper.userData, LCInitUserData,
             nil];

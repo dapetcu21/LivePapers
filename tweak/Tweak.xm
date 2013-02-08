@@ -34,11 +34,33 @@ extern "C" void LPDisplayLinkInit();
     %orig;
 }
 
--(void)resetIdleTimerAndUndim
+/*-(void)resetIdleTimerAndUndim
 {
     %orig;
     LPController * c = [LPController sharedInstance];
     [[c wallpaperForVariant:c.currentVariant].viewController resetIdleTimer];
+}
+*/
+
+-(void)sendEvent:(UIEvent*)evt
+{
+    %orig;
+    if (evt.type == UIEventTypeTouches && [(UITouch*)[[evt allTouches] anyObject] phase] == UITouchPhaseBegan)
+    {
+        BOOL doit = NO;
+        NSSet * set = [evt allTouches]; 
+        for (UITouch * e in set)
+            if (e.phase == UITouchPhaseBegan)
+            {
+                doit = YES;
+                break;
+            }
+        if (doit)
+        {
+            LPController * c = [LPController sharedInstance];
+            [[c wallpaperForVariant:c.currentVariant].viewController resetIdleTimer];
+        }
+    }
 }
 %end
 
