@@ -105,6 +105,8 @@
 
 -(void)reloadPreferences
 {
+    [self setCurrentContext];
+    
     NSDictionary * prefs = [NSDictionary dictionaryWithContentsOfFile:NXPrefsPath];
 
     NSNumber * nr;
@@ -194,7 +196,6 @@
     };
     glBufferData(GL_ARRAY_BUFFER, sizeof(array), array, GL_STATIC_DRAW);
 
-   
     glEnableVertexAttribArray(0);
     glEnableVertexAttribArray(1);
     glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 4*sizeof(GLfloat), NULL);
@@ -439,6 +440,7 @@ void computeParticle(NexusViewController * self, particle * p, GLfloat * data, G
 
 -(void)update
 {
+    [self setCurrentContext];
     if (n != count + spawns)
     {
         size_t oldn = n;

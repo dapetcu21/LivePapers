@@ -10,7 +10,6 @@
 @synthesize userData;
 @synthesize hasSettings;
 @synthesize index;
-@synthesize image;
 
 - (id)initWithBundleID:(NSString*)path
 {
@@ -24,14 +23,41 @@
             name = [[NSString stringWithString:[dict objectForKey:@"Name"]] retain];
             plugin = [[NSString stringWithString:[dict objectForKey:@"Plugin"]] retain];
             userData = [[dict objectForKey:@"User Data"] retain];
-            hasSettings = [(NSNumber*)[dict objectForKey:@"Has Settings"] boolValue];
-
+            id hs = [dict objectForKey:@"Has Settings"];
+            if ([hs isKindOfClass:[NSString class]] && [hs isEqualToString:@"Check"])
+                hasSettings = [self.preview hasPreferences];
+            else 
+                hasSettings = [(NSNumber*)hs boolValue];
         } @catch(...) {
             [self release];
             return nil;
         }
     }
     return self;
+}
+
+- (UIImage*)image
+{
+    return image;
+}
+
+- (void)setImage:(UIImage*)img
+{
+    if (img == image) return;
+    [img retain];
+    [image release];
+    image = img;
+    
+    if (img)
+    {
+        @try {
+        NSData * data = UIImagePNGRepresentation(img);
+        [data writeToFile:[LCIconCachePath stringByAppendingPathComponent:[NSString stringWithFormat:@"%@.png", self.bundleID]] atomically:NO];
+        } @catch(id ex) {
+            NSLog(@"couldn't save thumbnail: %@", ex);
+        }
+    }
+        
 }
 
 - (LPPreview*)preview

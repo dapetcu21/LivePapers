@@ -10,12 +10,14 @@
     {
         master = v;
         [master retain];
+        [master addScreenView];
     }
     return self;
 }
 
 -(void)dealloc
 {
+    [master removeScreenView];
     [master release];
     [super dealloc];
 }

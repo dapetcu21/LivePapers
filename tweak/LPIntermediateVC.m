@@ -83,7 +83,12 @@
     return currentVariant;
 }
 
-#define getMask() (screenLit && viewShowing && active[currentVariant])
+-(BOOL)screenshotShowing
+{
+    return screenshotShowing;
+}
+
+#define getMask() (screenLit && viewShowing && !screenshotShowing && active[currentVariant])
 
 -(void)setScreenLit:(BOOL)v
 {
@@ -91,6 +96,16 @@
     {
         BOOL om = getMask();
         screenLit = v;
+        [self updateWithOldMask: om];
+    }
+}
+
+-(void)setScreenshotShowing:(BOOL)v
+{
+    if (v!=screenshotShowing)
+    {
+        BOOL om = getMask();
+        screenshotShowing = v;
         [self updateWithOldMask: om];
     }
 }

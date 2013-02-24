@@ -19,6 +19,8 @@
 #define LCCenterMessageReload @"reloadSettings"
 #define LCCenterMessagePrefs @"reloadPreferences"
 #define LCWallpapersPath @LCRoot "Library/LivePapers/Wallpapers"
+//#define LCIconCachePath [NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES) lastObject]
+#define LCIconCachePath @LCVarMobile "Library/Caches/org.porkholt.LivePapers/Thumbnails"
 #define LCPluginsPath @LCRoot "Library/LivePapers/Plugins"
 #define LCBuiltinPrefsPath @LCVarMobile "Library/Preferences/org.porkholt.livepapers.builtinprefs.plist"
 #define LCBuiltinPrefsSolidColor @"LCSolidColor"

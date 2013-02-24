@@ -13,14 +13,13 @@
 
 extern "C" void LPDisplayLinkInit();
 
--(void)applicationDidFinishLaunching:(UIApplication*)app
+static void resetIdle()
 {
-    LPDisplayLinkInit();
-    %orig;
-    [LPController sharedInstance];
+    LPController * c = [LPController sharedInstance];
+    [[c wallpaperForVariant:c.currentVariant].viewController resetIdleTimer];
 }
 
--(void)setBacklightFactor:(float)f keepTouchOn:(BOOL)touch
+static void setBacklight(float f)
 {
     static BOOL backlight = YES;
     BOOL b = (f != 0);
@@ -30,17 +29,47 @@ extern "C" void LPDisplayLinkInit();
         [c wallpaperForVariant:0].viewController.screenLit = b;
         [c wallpaperForVariant:1].viewController.screenLit = b;
         backlight = b;
+        resetIdle();
     }
-    %orig;
 }
 
-/*-(void)resetIdleTimerAndUndim
+%group backlight1
+-(void)setBacklightFactor:(float)f
+{
+    setBacklight(f);
+    %orig;
+}
+%end
+
+%group backlight2
+-(void)setBacklightFactor:(float)f keepTouchOn:(BOOL)touch
+{
+    setBacklight(f);
+    %orig;
+}
+%end
+
+%group reset1
+-(void)resetIdleTimerAndUndim
 {
     %orig;
-    LPController * c = [LPController sharedInstance];
-    [[c wallpaperForVariant:c.currentVariant].viewController resetIdleTimer];
+    resetIdle();
 }
-*/
+%end
+
+%group reset2
+-(void)resetIdleTimerAndUndim:(BOOL)undim
+{
+    %orig;
+    resetIdle();
+}
+%end
+
+-(void)menuButtonDown:(GSEventRef)down
+{
+    %orig;
+    resetIdle(); 
+}
 
 -(void)sendEvent:(UIEvent*)evt
 {
@@ -56,12 +85,24 @@ extern "C" void LPDisplayLinkInit();
                 break;
             }
         if (doit)
-        {
-            LPController * c = [LPController sharedInstance];
-            [[c wallpaperForVariant:c.currentVariant].viewController resetIdleTimer];
-        }
+            resetIdle();
     }
 }
+
+-(void)applicationDidFinishLaunching:(UIApplication*)app
+{
+    [LPController sharedInstance];
+    if ([self respondsToSelector:@selector(resetIdleTimerAndUndim:)])
+        %init(reset2);
+    else
+        %init(reset1);
+    if ([self respondsToSelector:@selector(setBacklightFactor:keepTouchOn:)])
+        %init(backlight2);
+    else
+        %init(backlight1);
+    %orig;
+}
+
 %end
 
 %hook SBWallpaperView
@@ -91,3 +132,7 @@ extern "C" void LPDisplayLinkInit();
 }
 %end
 
+%ctor {
+    LPDisplayLinkInit();
+    %init(); 
+}

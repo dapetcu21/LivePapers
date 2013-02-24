@@ -11,7 +11,7 @@
 -(void)setFrame:(CGRect)bounds
 {
     [super setFrame:bounds];
-    [(LPGLViewController*)self.delegate reshape];
+    [(LPGLViewController*)self.delegate _reshape];
 }
 @end
 
@@ -33,15 +33,15 @@
 
     _context = [[[EAGLContext alloc] initWithAPI:kEAGLRenderingAPIOpenGLES2] autorelease];
 
-    if (!_context) {
+    if (!_context)
         NSLog(@"Failed to create ES context");
-    }
     
+    NSLog(@"created context: %@", _context);
+    [EAGLContext setCurrentContext:_context];
+
     self.view = view;
     view.context = _context;
     view.delegate = self;
-    
-    [EAGLContext setCurrentContext:_context];
 
     [self setupGL];
 }
@@ -73,6 +73,12 @@
 {
 }
 
+-(void)_reshape
+{
+    [EAGLContext setCurrentContext:_context];
+    [self reshape];
+}
+
 -(void)reshape
 {
 }
@@ -84,6 +90,7 @@
 
 -(void)glkView:(GLKView *)view drawInRect:(CGRect)rect
 {
+    [EAGLContext setCurrentContext:_context];
     [self render];
 }
 
@@ -230,7 +237,7 @@
 
 -(void)_setFPS:(unsigned int)stage
 {
-    const NSInteger stages[] = {60, 30, 15, 15, 0};
+    const NSInteger stages[] = {60, 30, 30, 0};
     if (stage >= (sizeof(stages)/sizeof(NSInteger)))
         stage  = (sizeof(stages)/sizeof(NSInteger)) - 1;
     if (stages[stage])

@@ -1,0 +1,9 @@
+Package: org.porkholt.livepapers.bubblespro
+Name: Bubbles Pro LivePaper
+Depends: org.porkholt.LivePapers
+Version: 1.0.0
+Architecture: iphoneos-arm
+Description: Configurable OpenGL Bubbles live wallpaper
+Maintainer: Porkholt Labs! <support@porkholt.org>
+Author: Porkholt Labs! <support@porkholt.org>
+Section: Addons (LivePapers)

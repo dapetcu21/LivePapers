@@ -1,0 +1,11 @@
+Package: org.porkholt.LivePapers
+Name: LivePapers
+Depends: mobilesubstrate
+Version: 1.0.1
+Architecture: iphoneos-arm
+Description: Live Wallpapers platform for iOS
+Maintainer: Porkholt Labs! <support@porkholt.org>
+Author: Porkholt Labs! <support@porkholt.org>
+Icon: file:///Applications/LivePapers.app/Icon.png
+Section: Tweaks
+Conflicts: com.phoenix.mcpro6

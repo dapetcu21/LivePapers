@@ -76,7 +76,17 @@
     [bar addSubview:lockBadge];
 
     if ([papers count])
-        [self selectedPaper:(LPPaper*)[papers objectAtIndex:0]];
+    {
+        LPPaper * pp = (LPPaper*)[papers objectAtIndex:0];
+        for (LPPaper * paper in papers)
+            if ([paper.bundleID isEqual:homePaper])
+            {
+                pp = paper;
+                [flowView setSelectedCover:pp.index];
+                break;
+            }
+        [self selectedPaper:pp];
+    }
     else
         [self selectedPaper:nil];
 
@@ -116,9 +126,18 @@
     [self saveSettings:LCPrefsLockKey];
 }
 
+- (void)dismissPreferencesView
+{
+    [flowView dismissFlipView];
+}
+
 - (void)configurePaper
 {
-    if (flowView.flipView) return;
+    if (flowView.flipView)
+    {
+        [self dismissPreferencesView];
+        return;
+    }
     NSUInteger index = flowView.selectedCoverView.number;
     if ((NSUInteger)index < [papers count])
     {
@@ -126,6 +145,8 @@
         UIViewController * viewController = paper.preview.prefsViewController;
         if (viewController)
         {
+            if ([viewController respondsToSelector:@selector(setRootViewController:)])
+                [viewController performSelector:@selector(setRootViewController:) withObject:self];
             flippedPaper = paper;
             [paper.preview retain];
             UIView * view = viewController.view;
@@ -168,6 +189,7 @@
 }
 
 
+
 - (void)openFlowFlipViewDidEnd:(AFOpenFlowView*)openFlowView
 {
     if (!flippedPaper) return;
@@ -195,6 +217,8 @@
 }
 
 - (void)loadPapers {
+    [[NSFileManager defaultManager] createDirectoryAtPath:LCIconCachePath withIntermediateDirectories:YES attributes:nil error:NULL];
+
     if (papers)
         [papers release];
     papers = [[NSMutableArray alloc] init];
@@ -265,7 +289,9 @@
 - (void)loadImageForPaper:(LPPaper*)p
 {
     NSAutoreleasePool * pool = [NSAutoreleasePool new];
-    UIImage * img = [UIImage imageWithContentsOfFile: [NSString stringWithFormat:@"/%@/%@/Default.png", LCWallpapersPath, p.bundleID]];
+    UIImage * img = [UIImage imageWithContentsOfFile: [NSString stringWithFormat:@"/%@/%@.png", LCIconCachePath, p.bundleID]];
+    if (!img)
+        img = [UIImage imageWithContentsOfFile: [NSString stringWithFormat:@"/%@/%@/Default.png", LCWallpapersPath, p.bundleID]];
     if (!img)
         img = defaultImage;
     [self performSelectorOnMainThread:@selector(imageLoadedForPaper:) withObject:[NSArray arrayWithObjects: p, img, nil] waitUntilDone:NO];
@@ -309,7 +335,7 @@
             [self timerFired];
             [preview toggleFullScreen];
         } else {
-            //TODO
+            [[UIApplication sharedApplication] openURL:[NSURL URLWithString: @"cydia://search/LivePapers"]];
         }
     }
 }

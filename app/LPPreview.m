@@ -59,6 +59,11 @@
     return prefsViewController;
 }
 
+- (BOOL)hasPreferences
+{
+    return [plugin hasPreferences:initInfo];
+}
+
 - (void)dealloc
 {
     [initInfo release];

@@ -28,6 +28,7 @@
                 userInfo: nil];
         }
         prefsFunction = dlsym(handle, "LPInitPrefsViewController");
+        hasPrefsFunction = dlsym(handle, "LPInitPrefsViewController");
     }
     return self;
 }
@@ -48,6 +49,12 @@
 {
     if (!prefsFunction) return nil;
     return prefsFunction(userInfo);
+}
+
+- (BOOL)hasPreferences:(void*)userInfo
+{
+    if (!hasPrefsFunction) return NO;
+    return hasPrefsFunction(userInfo) != 0;
 }
 
 

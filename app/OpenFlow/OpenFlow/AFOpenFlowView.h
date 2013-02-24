@@ -108,5 +108,6 @@
 - (void)setImage:(UIImage *)image forIndex:(NSInteger)index animated:(BOOL)anim;
 - (CGRect)previewFrameForIndex:(NSInteger)index;
 - (void)flipWithView:(UIView*)view;
+- (void)dismissFlipView;
 
 @end

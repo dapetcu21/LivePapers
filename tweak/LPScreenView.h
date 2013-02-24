@@ -3,6 +3,17 @@
 
 @interface LPScreenView : UIView
 {
+    //in case anybody tries to change the ivars
+	int _orientation;
+	int _variant;
+	UIImageView* _topGradient;
+	UIImageView* _bottomGradient;
+	BOOL _usesFilter;
+	float _gradientAlpha;
+	CGRect _wallpaperContentsRect;
+	BOOL _postsNotifications;
+	BOOL _flushWallpaperAutomatically;
+    
     LPView * master;
     int orient;
 }

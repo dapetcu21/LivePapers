@@ -1,0 +1,4 @@
+#!/bin/bash
+
+killall LivePapers 2> /dev/null
+exit 0

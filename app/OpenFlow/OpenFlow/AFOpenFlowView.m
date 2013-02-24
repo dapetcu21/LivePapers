@@ -480,21 +480,26 @@ NS_INLINE NSRange NSMakeRangeToIndex(NSUInteger loc, NSUInteger loc2) {
 	}
 }
 
+- (void)dismissFlipView
+{
+    if (!flipView || !self.userInteractionEnabled) return;
+    self.userInteractionEnabled = NO;
+    if ([viewDelegate respondsToSelector:@selector(openFlowFlipViewWillEnd:)])
+        [viewDelegate openFlowFlipViewWillEnd:self];
+
+    TPPropertyAnimation *animation = [TPPropertyAnimation propertyAnimationWithKeyPath:@"flipRotation"];
+    animation.fromValue = [NSNumber numberWithFloat:M_PI];
+    animation.toValue = [NSNumber numberWithFloat:0];
+    animation.duration = 1;
+    animation.delegate = self;
+    animation.timing = TPPropertyAnimationTimingEaseInEaseOut;
+    [animation beginWithTarget:self];
+}
+
 - (void)touchesEnded:(NSSet *)touches withEvent:(UIEvent *)event {
     if (flipView)
     {
-        self.userInteractionEnabled = NO;
-        if ([viewDelegate respondsToSelector:@selector(openFlowFlipViewWillEnd:)])
-            [viewDelegate openFlowFlipViewWillEnd:self];
-
-        TPPropertyAnimation *animation = [TPPropertyAnimation propertyAnimationWithKeyPath:@"flipRotation"];
-        animation.fromValue = [NSNumber numberWithFloat:M_PI];
-        animation.toValue = [NSNumber numberWithFloat:0];
-        animation.duration = 1;
-        animation.delegate = self;
-        animation.timing = TPPropertyAnimationTimingEaseInEaseOut;
-        [animation beginWithTarget:self];
-
+        [self dismissFlipView];
         return;
     }
 	

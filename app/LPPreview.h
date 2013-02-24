@@ -9,6 +9,7 @@
     UIViewController * viewController;
     UIViewController * prefsViewController;
     BOOL triedLoadingPrefs;
+    BOOL hasPrefs;
 }
 
 @property(nonatomic, readonly) UIViewController * viewController;
@@ -17,4 +18,5 @@
 @property(nonatomic, readonly) UIViewController * prefsViewController;
 
 - (id)initWithPaper:(LPPaper*)paper;
+- (BOOL)hasPreferences;
 @end

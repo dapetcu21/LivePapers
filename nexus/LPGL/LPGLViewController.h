@@ -37,6 +37,7 @@
 
 -(void)setCurrentContext;
 -(void)resetIdleTimer;
+-(void)_reshape;
 
 @end
 

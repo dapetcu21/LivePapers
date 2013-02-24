@@ -169,6 +169,7 @@ static LPController * LPControllerSharedInstance = nil;
 
 -(void)setLockView:(LPView*)v
 {
+    //NSLog(@"setlockview: %@", v);
     currentVariant = v ? 0 : 1;
     walls[0].viewController.currentVariant = currentVariant;
     walls[1].viewController.currentVariant = currentVariant;
@@ -186,6 +187,7 @@ static LPController * LPControllerSharedInstance = nil;
 
 -(void)setView:(LPView*)v
 {
+    //NSLog(@"setview: %@", v);
     view = v;
     if (v)
         v.wallpaper = walls[1];

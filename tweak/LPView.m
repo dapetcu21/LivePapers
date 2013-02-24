@@ -7,15 +7,18 @@
 #include <dlfcn.h>
 
 UIImage * (*LPWallpaperImage)(int variant);
+BOOL (*LPWallpaperImageIsWallpaperImage)(UIImage * img);
 CGRect (*LPWallpaperContentsRectForAspectFill)(CGSize, CGRect);
 
 @implementation LPView
 @synthesize variant;
+@synthesize alpha;
 
 +(void)initialize
 {
     void * h = dlopen(NULL, RTLD_LAZY | RTLD_LOCAL);
     LPWallpaperImage = dlsym(h, "SBWallpaperImageForVariant");
+    LPWallpaperImageIsWallpaperImage = dlsym(h, "SBWallpaperImageIsWallpaperImage");
     LPWallpaperContentsRectForAspectFill = dlsym(h, "SBWallpaperContentsRectForAspectFill");
 }
 
@@ -48,8 +51,35 @@ CGRect (*LPWallpaperContentsRectForAspectFill)(CGSize, CGRect);
     orient = o;
 }
 
+
+-(void)replaceWallpaperWithImage:(UIImage*)_image
+{
+    [self setImage:_image];
+}
+
+-(void)resetCurrentImageToWallpaper
+{
+    [self setImage:nil];
+}
+
 -(void)setImage:(UIImage*)img
 {
+    if (img && LPWallpaperImageIsWallpaperImage(img))
+        img = nil;
+    if (img)
+    {
+        UIImageView * iv = (UIImageView*)[self viewWithTag:7890];
+        if (!iv)
+        {
+            iv = [[[UIImageView alloc] initWithFrame:self.bounds] autorelease];
+            iv.tag = 7890;
+            iv.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
+            [self addSubview:iv];
+        }
+        iv.image = img;
+    } else {
+        [[self viewWithTag:7890] removeFromSuperview];
+    }
 }
 
 -(UIImage*)screenshot
@@ -90,6 +120,7 @@ CGRect (*LPWallpaperContentsRectForAspectFill)(CGSize, CGRect);
 
 -(UIImage*)image
 {
+    if (image)
     if (vc && (vc.view.superview == self) && !alreadyScreened)
     {
         [self screenshot];
@@ -161,6 +192,7 @@ CGRect (*LPWallpaperContentsRectForAspectFill)(CGSize, CGRect);
         [[self viewWithTag:12424] removeFromSuperview];
         [self setWallImage: image];
         [self setWallRect:imageRect];
+        [self updateScreenView];
     }
 }
 
@@ -184,6 +216,8 @@ CGRect (*LPWallpaperContentsRectForAspectFill)(CGSize, CGRect);
     {
         self.orientation = ori;
         self.variant = var;
+        self.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
+        self.autoresizesSubviews = YES;
     }
     return self;
 }
@@ -200,5 +234,23 @@ CGRect (*LPWallpaperContentsRectForAspectFill)(CGSize, CGRect);
     [screen release];
     [super dealloc];
 }
+
+-(void)updateScreenView
+{
+    vc.screenshotShowing = screenViews != 0;
+}
+
+-(void)addScreenView
+{
+    screenViews++;
+    [self updateScreenView];
+}
+
+-(void)removeScreenView
+{
+    screenViews--;
+    [self updateScreenView];
+}
+
 
 @end
