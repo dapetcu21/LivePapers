@@ -78,4 +78,21 @@
 {
 }
 
+-(UIImage*)image
+{
+    return nil;
+}
+
+-(void)setImage:(UIImage*)img
+{
+}
+
+-(void)resetCurrentImageToWallpaper
+{
+}
+
+-(void)replaceWallpaperWithImage:(UIImage*)image
+{
+}
+
 @end

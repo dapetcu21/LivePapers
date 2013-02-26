@@ -90,12 +90,18 @@
 
 #define getMask() (screenLit && viewShowing && !screenshotShowing && active[currentVariant])
 
+-(BOOL)showingOverall
+{
+    return getMask();
+}
+
 -(void)setScreenLit:(BOOL)v
 {
     if (v!=screenLit)
     {
         BOOL om = getMask();
         screenLit = v;
+        NSLog(@"setScreenLit: %d", v);
         [self updateWithOldMask: om];
     }
 }
@@ -125,6 +131,7 @@
     if (active[var] == a) return;
     BOOL om = getMask();
     active[var] = a;
+    NSLog(@"setActive: %d forVariant:%d", a, var);
     [self updateWithOldMask: om];
 }
 
@@ -135,6 +142,7 @@
         BOOL om = getMask();
         viewShowing = v;
         [self updateWithOldMask: om];
+        NSLog(@"setViewShowing: %d %d", v, getMask());
     }
 }
 

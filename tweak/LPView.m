@@ -252,5 +252,13 @@ CGRect (*LPWallpaperContentsRectForAspectFill)(CGSize, CGRect);
     [self updateScreenView];
 }
 
+- (void)willMoveToWindow:(UIWindow *)window
+{
+    LPController * c = [LPController sharedInstance];
+    if (c.lockView == self)
+    {
+        c.currentVariant = window ? 0 : 1;
+    }
+}
 
 @end

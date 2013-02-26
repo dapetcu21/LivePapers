@@ -3,11 +3,15 @@
 #import "LPController.h"
 #import <SpringBoard/SpringBoard.h>
 #import <SpringBoard/SBWallpaperView.h>
+#import <SpringBoard/SBAwayController.h>
+#import <objc/runtime.h>
 
 #import "LPView.h"
 #import "LPScreenView.h"
 #import "LPIntermediateVC.h"
 #import "LPWallpaper.h"
+
+Class SpringBoard$;
 
 %hook SpringBoard 
 
@@ -74,36 +78,42 @@ static void setBacklight(float f)
 -(void)sendEvent:(UIEvent*)evt
 {
     %orig;
-    if (evt.type == UIEventTypeTouches && [(UITouch*)[[evt allTouches] anyObject] phase] == UITouchPhaseBegan)
+    if (evt.type == UIEventTypeTouches)
     {
-        BOOL doit = NO;
-        NSSet * set = [evt allTouches]; 
-        for (UITouch * e in set)
-            if (e.phase == UITouchPhaseBegan)
-            {
-                doit = YES;
-                break;
-            }
-        if (doit)
-            resetIdle();
+        LPController * c = [LPController sharedInstance];
+        [c relayEvent:evt];
+        if ([(UITouch*)[[evt allTouches] anyObject] phase] == UITouchPhaseBegan)
+        {
+            BOOL doit = NO;
+            NSSet * set = [evt allTouches]; 
+            for (UITouch * e in set)
+                if (e.phase == UITouchPhaseBegan)
+                {
+                    doit = YES;
+                    break;
+                }
+            if (doit)
+                resetIdle();
+        }
     }
 }
 
--(void)applicationDidFinishLaunching:(UIApplication*)app
+%end
+
+@interface LPHomescreenView : LPView {}
+@end
+@implementation LPHomescreenView
+@end
+@interface LPLockscreenView : LPView {}
+@end
+@implementation LPLockscreenView 
+
+- (UIView *)hitTest:(CGPoint)point withEvent:(UIEvent *)event
 {
-    [LPController sharedInstance];
-    if ([self respondsToSelector:@selector(resetIdleTimerAndUndim:)])
-        %init(reset2);
-    else
-        %init(reset1);
-    if ([self respondsToSelector:@selector(setBacklightFactor:keepTouchOn:)])
-        %init(backlight2);
-    else
-        %init(backlight1);
-    %orig;
+    return self;
 }
 
-%end
+@end
 
 %hook SBWallpaperView
 -(id)initWithOrientation:(int)orient variant:(int)var
@@ -115,7 +125,7 @@ static void setBacklight(float f)
         {
             NSDeallocateObject(self);
             if (!c.view)
-                return self = c.view = [[LPView alloc] initWithOrientation:orient variant:var];
+                return self = c.view = [[LPHomescreenView alloc] initWithOrientation:orient variant:var];
             else
                 return self = [[LPScreenView alloc] initWithMasterView:c.view];
         }
@@ -123,7 +133,7 @@ static void setBacklight(float f)
         {
             NSDeallocateObject(self);
             if (!c.lockView)
-                return self = c.lockView = [[LPView alloc] initWithOrientation:orient variant:var];
+                return self = c.lockView = [[LPLockscreenView alloc] initWithOrientation:orient variant:var];
             else
                 return self = [[LPScreenView alloc] initWithMasterView:c.lockView];
         }
@@ -133,6 +143,18 @@ static void setBacklight(float f)
 %end
 
 %ctor {
+    SpringBoard$ = objc_getClass("SpringBoard");
+
     LPDisplayLinkInit();
     %init(); 
+
+    if ([SpringBoard$ instancesRespondToSelector:@selector(resetIdleTimerAndUndim:)])
+        %init(reset2);
+    else
+        %init(reset1);
+    
+    if ([SpringBoard$ instancesRespondToSelector:@selector(setBacklightFactor:keepTouchOn:)])
+        %init(backlight2);
+    else
+        %init(backlight1);
 }

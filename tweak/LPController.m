@@ -10,7 +10,6 @@
 
 @implementation LPController
 @synthesize view;
-@synthesize currentVariant;
 
 static LPController * LPControllerSharedInstance = nil;
 
@@ -28,6 +27,7 @@ static LPController * LPControllerSharedInstance = nil;
         LPControllerSharedInstance = self;
         plugins = [[NSMutableDictionary alloc] init];
         papers = [[NSMutableDictionary alloc] init];
+        touches = [[NSMutableSet alloc] init];
         [self reloadSettings];
         Class $CPDistributedMessagingCenter = objc_getClass("CPDistributedMessagingCenter");
 		center = [$CPDistributedMessagingCenter centerNamed:LCCenterName];
@@ -48,6 +48,7 @@ static LPController * LPControllerSharedInstance = nil;
     [papers release];
     [walls[0] release];
     [walls[1] release];
+    [touches release];
     [super dealloc];
 }
 
@@ -155,6 +156,8 @@ static LPController * LPControllerSharedInstance = nil;
         lockView.wallpaper = walls[0];
     if (var == 1 && view && !lockView)
         view.wallpaper = walls[1];
+    
+    [self setCurrentVariant:currentVariant];
 }
 
 -(LPView*)lockView
@@ -169,7 +172,10 @@ static LPController * LPControllerSharedInstance = nil;
 
 -(void)setLockView:(LPView*)v
 {
+    lockView = v;
+    [self setCurrentVariant:currentVariant];
     //NSLog(@"setlockview: %@", v);
+    return;
     currentVariant = v ? 0 : 1;
     walls[0].viewController.currentVariant = currentVariant;
     walls[1].viewController.currentVariant = currentVariant;
@@ -189,8 +195,38 @@ static LPController * LPControllerSharedInstance = nil;
 {
     //NSLog(@"setview: %@", v);
     view = v;
-    if (v)
-        v.wallpaper = walls[1];
+    [self setCurrentVariant:currentVariant];
+}
+
+-(void)setCurrentVariant:(int)var
+{
+    currentVariant = var;
+    walls[0].viewController.currentVariant = currentVariant;
+    walls[1].viewController.currentVariant = currentVariant;
+    if (currentVariant == 1 && view)
+        view.wallpaper = walls[1];
+    if (currentVariant == 0 && lockView)
+        lockView.wallpaper = walls[0];
+}
+
+-(int)currentVariant
+{
+    return currentVariant;
+}
+
+-(void)relayEvent:(UIEvent*)evt
+{
+    
+}
+
+-(void)beginAllTouches
+{
+    NSLog(@"begin all touches");
+}
+
+-(void)cancelAllTouches
+{
+    NSLog(@"cancel all touches");
 }
 
 @end

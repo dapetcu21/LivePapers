@@ -26,4 +26,6 @@
 -(BOOL)knowsScreenShot;
 -(UIImage*)screenShot;
 
+-(BOOL)showingOverall;
+
 @end
