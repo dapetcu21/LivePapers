@@ -11,7 +11,6 @@
     NSMutableDictionary * plugins, * papers;
     LPWallpaper * walls[2];
     CPDistributedMessagingCenter * center;
-    NSMutableSet * touches;
 
     int currentVariant;
 }
@@ -34,7 +33,5 @@
 -(void)reloadSettingsWithMessage:(NSString*)message userData:(NSDictionary*)userData;
 
 -(void)relayEvent:(UIEvent*)evt;
--(void)beginAllTouches;
--(void)cancelAllTouches;
 
 @end

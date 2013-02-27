@@ -27,7 +27,6 @@ static LPController * LPControllerSharedInstance = nil;
         LPControllerSharedInstance = self;
         plugins = [[NSMutableDictionary alloc] init];
         papers = [[NSMutableDictionary alloc] init];
-        touches = [[NSMutableSet alloc] init];
         [self reloadSettings];
         Class $CPDistributedMessagingCenter = objc_getClass("CPDistributedMessagingCenter");
 		center = [$CPDistributedMessagingCenter centerNamed:LCCenterName];
@@ -48,7 +47,6 @@ static LPController * LPControllerSharedInstance = nil;
     [papers release];
     [walls[0] release];
     [walls[1] release];
-    [touches release];
     [super dealloc];
 }
 
@@ -174,26 +172,10 @@ static LPController * LPControllerSharedInstance = nil;
 {
     lockView = v;
     [self setCurrentVariant:currentVariant];
-    //NSLog(@"setlockview: %@", v);
-    return;
-    currentVariant = v ? 0 : 1;
-    walls[0].viewController.currentVariant = currentVariant;
-    walls[1].viewController.currentVariant = currentVariant;
-
-    if (lockView && !v && view && walls[1] && (walls[1] == walls[0]))
-        view.wallpaper = walls[1];
-    lockView = v;
-    if (v)
-    {
-        if (view && (walls[1] == walls[0]))
-            view.viewController = nil;
-        v.wallpaper = walls[0];
-    }
 }
 
 -(void)setView:(LPView*)v
 {
-    //NSLog(@"setview: %@", v);
     view = v;
     [self setCurrentVariant:currentVariant];
 }
@@ -216,17 +198,7 @@ static LPController * LPControllerSharedInstance = nil;
 
 -(void)relayEvent:(UIEvent*)evt
 {
-    
-}
-
--(void)beginAllTouches
-{
-    NSLog(@"begin all touches");
-}
-
--(void)cancelAllTouches
-{
-    NSLog(@"cancel all touches");
+    [walls[currentVariant].viewController relayEvent:evt];
 }
 
 @end

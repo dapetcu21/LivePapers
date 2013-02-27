@@ -4,7 +4,9 @@
 #import <SpringBoard/SpringBoard.h>
 #import <SpringBoard/SBWallpaperView.h>
 #import <SpringBoard/SBAwayController.h>
-#import <objc/runtime.h>
+
+#include <objc/runtime.h>
+#include <notify.h>
 
 #import "LPView.h"
 #import "LPScreenView.h"
@@ -23,10 +25,9 @@ static void resetIdle()
     [[c wallpaperForVariant:c.currentVariant].viewController resetIdleTimer];
 }
 
-static void setBacklight(float f)
+static void setBacklight(BOOL b)
 {
     static BOOL backlight = YES;
-    BOOL b = (f != 0);
     if (b != backlight)
     {
         LPController * c = [LPController sharedInstance];
@@ -37,21 +38,21 @@ static void setBacklight(float f)
     }
 }
 
-%group backlight1
--(void)setBacklightFactor:(float)f
+static BOOL checkBacklightState()
 {
-    setBacklight(f);
-    %orig;
+    uint64_t state;
+    static int token = 0;
+    if(!token)
+        notify_register_check("com.apple.iokit.hid.displayStatus", &token);
+    notify_get_state(token, &state);
+    return state ? 1 : 0;
 }
-%end
 
-%group backlight2
--(void)setBacklightFactor:(float)f keepTouchOn:(BOOL)touch
+
+static void processBacklightState()
 {
-    setBacklight(f);
-    %orig;
+    setBacklight(checkBacklightState());
 }
-%end
 
 %group reset1
 -(void)resetIdleTimerAndUndim
@@ -152,9 +153,7 @@ static void setBacklight(float f)
         %init(reset2);
     else
         %init(reset1);
-    
-    if ([SpringBoard$ instancesRespondToSelector:@selector(setBacklightFactor:keepTouchOn:)])
-        %init(backlight2);
-    else
-        %init(backlight1);
+
+    CFNotificationCenterRef darwin = CFNotificationCenterGetDarwinNotifyCenter();
+    CFNotificationCenterAddObserver(darwin, NULL, (CFNotificationCallback)processBacklightState, (CFStringRef) @"com.apple.iokit.hid.displayStatus", NULL, NULL);
 }
