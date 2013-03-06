@@ -67,7 +67,7 @@
     }
     
 #define addlabel(txt, off) \
-    label = [[UILabel alloc] initWithFrame: CGRectMake(30, currentHeight + off, f.size.width - 160, 30)]; \
+    label = [[UILabel alloc] initWithFrame: CGRectMake(30, currentHeight + (off), f.size.width - 160, 30)]; \
     label.text = txt; \
     label.backgroundColor = [UIColor clearColor]; \
     label.textColor = [UIColor whiteColor]; \
@@ -75,11 +75,15 @@
     [v addSubview:label]; \
     [label release]; \
     
-#define segmentedpref(txt, var, text1, text2) \
-    addlabel(txt, 5.0) \
+#define segmentedpref(txt, var, ...) \
+    addlabel(txt, ((UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad) ? 5.0 : 0.0)) \
     \
-    var ## Segmented = [[UISegmentedControl alloc] initWithItems:[NSArray arrayWithObjects:text1, text2, nil]]; \
+    var ## Segmented = [[UISegmentedControl alloc] initWithItems:[NSArray arrayWithObjects:__VA_ARGS__, nil]]; \
     var ## Segmented.selectedSegmentIndex = s.var; \
+    if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPhone) { \
+        var ## Segmented.segmentedControlStyle = UISegmentedControlStyleBar; \
+        var ## Segmented.tintColor = [UIColor grayColor]; \
+    } \
     [var ## Segmented addTarget:self action:@selector(valueChanged:) forControlEvents:UIControlEventValueChanged]; \
     [v addSubview:var ## Segmented]; \
     var ## Segmented.autoresizingMask = UIViewAutoresizingFlexibleBottomMargin | UIViewAutoresizingFlexibleLeftMargin; \
@@ -125,7 +129,7 @@
         [vv release]; \
     }
     
-    segmentedpref(@"Background", bgType, @"Default", @"Custom");
+    segmentedpref((UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad) ? @"Background" : @"Bg", bgType, @"Purple", @"Custom", @"Wallpaper");
     addlabel(@"Custom Colors", 5.0f);
     if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad)
     {
@@ -208,6 +212,7 @@
     [bgTypeSegmented release];
     [swirlSegmented release];
     [sharpEdgesSegmented release];
+    [rootViewController release];
 
     [super dealloc];
 }

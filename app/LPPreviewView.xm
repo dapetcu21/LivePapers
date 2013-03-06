@@ -24,7 +24,6 @@ static LPPreviewView * catchTouch = nil;
 -(void)setWallpaperImage:(UIImage*)img;
 -(void)setWallpaperRect:(CGRect)r;
 -(UIImage*)screenShot;
--(void)resetIdleTimer;
 @end
 
 @implementation LPPreviewView
@@ -48,25 +47,8 @@ static LPPreviewView * catchTouch = nil;
         self.userInteractionEnabled = NO;
         self.clipsToBounds = YES;
         self.autoresizesSubviews = YES;
-        timer = [NSTimer scheduledTimerWithTimeInterval:10.0f target:self selector:@selector(toWakeUpSleepingDogs) userInfo:nil repeats:YES];
     }
     return self;
-}
-
-- (void)toWakeUpSleepingDogs
-{
-    if (self.hidden) return;
-    UIViewController<LPViewController> * vc = (UIViewController<LPViewController>*)paper.preview.viewController;
-    if (!vc) return;
-    if ([vc respondsToSelector:@selector(resetIdleTimer)])
-        [vc resetIdleTimer];
-}
-
-- (void)setHidden:(BOOL)h
-{
-    [super setHidden:h];
-    if (!h)
-        [self toWakeUpSleepingDogs];
 }
 
 - (void)dealloc
@@ -89,7 +71,6 @@ UIImage * SBWallpaperImageForVariant(int);
 
 - (void)setViewControllerFrame:(CGRect)frame
 {
-    [self toWakeUpSleepingDogs];
     UIViewController<LPViewController> * vc = (UIViewController<LPViewController>*)paper.preview.viewController;
     if (!vc) return;
     if (view && [vc respondsToSelector:@selector(setWallpaperRect:)])
@@ -177,7 +158,6 @@ UIImage * SBWallpaperImageForVariant(int);
 - (void)setFullScreen:(BOOL)fs
 {
     if (fs == fullScreen) return;
-    [self toWakeUpSleepingDogs];
     fullScreen = fs;
     if (fullScreen)
     {

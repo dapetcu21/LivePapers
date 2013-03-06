@@ -143,6 +143,17 @@ static void processBacklightState()
 }
 %end
 
+%hook SBFolderSlidingView
+-(id)initWithPosition:(int)position folderView:(id)view
+{
+    LPController * c = [LPController sharedInstance];
+    c.initializingFolders = YES; 
+    id r = %orig;
+    c.initializingFolders = NO;
+    return r;
+}
+%end
+
 %ctor {
     SpringBoard$ = objc_getClass("SpringBoard");
 

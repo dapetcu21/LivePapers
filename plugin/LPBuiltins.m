@@ -1,5 +1,6 @@
 #import <UIKit/UIKit.h>
 #import "LPDefaultViewController.h"
+#import "LPDefaultPrefsController.h"
 #import "LPSolidViewController.h"
 #import "LPSolidPrefsController.h"
 
@@ -23,6 +24,10 @@ UIViewController * LPInitPrefsViewController(NSDictionary * info)
     if ([ud isEqual:@"Solid"])
     {
         return [[LPSolidPrefsController alloc] init];
+    }
+    if ([ud isEqual:@"Default"])
+    {
+        return [[LPDefaultPrefsController alloc] init];
     }
     return nil;
 }

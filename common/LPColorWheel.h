@@ -1,3 +1,5 @@
+#import "LPClassGuard.h"
+
 @class LPColorWheel;
 
 @protocol LPColorWheelDelegate

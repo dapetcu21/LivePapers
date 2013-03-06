@@ -16,6 +16,8 @@
     
     LPView * master;
     int orient;
+    BOOL retainsMaster;
+    BOOL retainedMaster;
 }
 
 @property(nonatomic, assign) int orientation;

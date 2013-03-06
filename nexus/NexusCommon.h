@@ -16,5 +16,6 @@
 #define NXVelocityKey @"StripVelocity"
 #define NXZToleranceKey @"ZTolerance"
 #define NXCountKey @"StripCount"
+#define NXColorsKey @"Colors"
 
 #endif

@@ -1,6 +1,6 @@
 Package: org.porkholt.LivePapers
 Name: LivePapers
-Depends: mobilesubstrate
+Depends: mobilesubstrate, preferenceloader
 Version: 1.0.2
 Architecture: iphoneos-arm
 Description: Live Wallpapers platform for iOS

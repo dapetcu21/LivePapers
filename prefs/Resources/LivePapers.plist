@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>items</key>
+    <array>
+        <dict>
+            <key>cell</key>
+            <string>PSGroupCell</string>
+            <key>label</key>
+            <string>Touch interaction</string>
+        </dict>
+        <dict>
+            <key>cell</key>
+            <string>PSSwitchCell</string>
+            <key>default</key>
+            <true/>
+            <key>defaults</key>
+            <string>org.porkholt.livepapers</string>
+            <key>key</key>
+            <string>InteractionHome</string>
+            <key>label</key>
+            <string>Home screen</string>
+        </dict>
+        <dict>
+            <key>cell</key>
+            <string>PSSwitchCell</string>
+            <key>default</key>
+            <true/>
+            <key>defaults</key>
+            <string>org.porkholt.livepapers</string>
+            <key>key</key>
+            <string>InteractionLock</string>
+            <key>label</key>
+            <string>Lock screen</string>
+        </dict>
+<!--        <dict>
+            <key>cell</key>
+            <string>PSGroupCell</string>
+            <key>label</key>
+            <string>Battery icon opacity</string>
+        </dict>
+        <dict>
+            <key>cell</key>
+            <string>PSSliderCell</string>
+            <key>default</key>
+            <real>1.0</real>
+            <key>defaults</key>
+            <string>org.porkholt.livepapers</string>
+            <key>key</key>
+            <string>AltImageAlpha</string>
+            <key>min</key>
+            <real>0.0</real>
+            <key>max</key>
+            <real>1.0</real>
+        </dict> -->
+        <dict>
+            <key>cell</key>
+            <string>PSGroupCell</string>
+            <key>label</key>
+            <string>Idle animation timer</string>
+        </dict>
+        <dict>
+            <key>cell</key>
+            <string>PSLinkListCell</string>
+            <key>default</key>
+            <real>40.0</real>
+            <key>defaults</key>
+            <string>org.porkholt.livepapers</string>
+            <key>key</key>
+            <string>IdleTimeout</string>
+            <key>label</key>
+            <string>Timeout</string>
+            <key>detail</key>
+            <string>PSListItemsController</string>
+            <key>validTitles</key>
+            <array>
+                <string>10 seconds</string>
+                <string>20 seconds</string>
+                <string>30 seconds</string>
+                <string>40 seconds</string>
+                <string>1 minute</string>
+                <string>2 minutes</string>
+                <string>5 minutes</string>
+                <string>Never</string>
+            </array>
+            <key>validValues</key>
+            <array>
+                <real>10.0</real>
+                <real>20.0</real>
+                <real>30.0</real>
+                <real>40.0</real>
+                <real>60.0</real>
+                <real>120.0</real>
+                <real>300.0</real>
+                <real>1000000000.0</real>
+            </array>
+        </dict>
+        <dict>
+            <key>cell</key>
+            <string>PSGroupCell</string>
+            <key>footerText</key>
+            <string>LivePapers © 2013 Porkholt Labs!
+http://porkholt.org</string>
+        </dict>
+    </array>
+    <key>title</key>
+    <string>LivePapers</string>
+</dict>
+</plist>

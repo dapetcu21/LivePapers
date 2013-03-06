@@ -74,9 +74,12 @@ CGRect (*LPWallpaperContentsRectForAspectFill)(CGSize, CGRect);
             iv = [[[UIImageView alloc] initWithFrame:self.bounds] autorelease];
             iv.tag = 7890;
             iv.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
+            iv.contentMode = UIViewContentModeTop;
+            iv.opaque = NO;
             [self addSubview:iv];
         }
         iv.image = img;
+        iv.alpha = [LPController sharedInstance].overlayAlpha;
     } else {
         [[self viewWithTag:7890] removeFromSuperview];
     }

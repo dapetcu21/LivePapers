@@ -41,6 +41,9 @@ struct particle
 
     GLKTextureInfo * tip;
     GLKTextureInfo * bg;
+    
+    uint32_t particle_colors[4]; 
+   
 }
 @property(nonatomic,retain) GLKTextureInfo * bg;
 @property(nonatomic,retain) GLKTextureInfo * tip;

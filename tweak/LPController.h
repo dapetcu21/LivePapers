@@ -13,11 +13,25 @@
     CPDistributedMessagingCenter * center;
 
     int currentVariant;
+
+    float idleTimeout;
+    float overlayAlpha;
+    BOOL interactionHome;
+    BOOL interactionLock;
+    
+    BOOL initializingFolders;
 }
 
 @property(nonatomic, assign) LPView * view;
 @property(nonatomic, assign) LPView * lockView;
 @property(nonatomic, assign) int currentVariant;
+
+@property(nonatomic, assign) float idleTimeout;
+@property(nonatomic, assign) float overlayAlpha;
+@property(nonatomic, assign) BOOL interactionHome;
+@property(nonatomic, assign) BOOL interactionLock;
+@property(nonatomic, assign) BOOL initializingFolders;
+
 
 +(LPController*)sharedInstance;
 

@@ -1,4 +1,5 @@
 #import "LPGLViewController.h"
+#include <dlfcn.h>
 
 @interface GLKViewController(_private)
 -(CADisplayLink*)displayLink;
@@ -235,9 +236,10 @@
     return t;
 }
 
+static const NSInteger stages[] = {60, 60, 30, 30, 0};
+
 -(void)_setFPS:(unsigned int)stage
 {
-    const NSInteger stages[] = {60, 30, 30, 0};
     if (stage >= (sizeof(stages)/sizeof(NSInteger)))
         stage  = (sizeof(stages)/sizeof(NSInteger)) - 1;
     if (stages[stage])
@@ -269,15 +271,30 @@
     idleTimer = nil;
 }
 
+static float getIdleTimeout()
+{
+    static void * handle = dlopen(NULL, RTLD_LAZY | RTLD_LOCAL);
+    static float (*f)() = (float (*)())dlsym(handle, "LPGetIdleTimeout");
+    if (f)
+        return f();
+    NSLog(@"Can't get idle timeout. Defaulting to 40 seconds"); 
+    return 40.0f;
+}
+
 -(void)resetIdleTimer
 {
     [idleTimer invalidate];
-    idleTimer = [NSTimer scheduledTimerWithTimeInterval:10.0f
+    idleTimer = [NSTimer scheduledTimerWithTimeInterval:getIdleTimeout()/((sizeof(stages)/sizeof(NSInteger)) - 1)
         target:self
         selector:@selector(timerFired)
         userInfo:nil
         repeats:YES];
     [self _setFPS:(fpsStage = 0)];
+}
+
+-(void)reloadPreferences
+{
+    [self resetIdleTimer];
 }
 
 @end

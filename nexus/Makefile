@@ -1,6 +1,6 @@
 export TARGET_IPHONEOS_DEPLOYMENT_VERSION = 4.3
 
-include theos/makefiles/common.mk
+include $(THEOS)/makefiles/common.mk
 
 LIBRARY_NAME = Nexus
 Nexus_FILES = Nexus.mm \
@@ -10,10 +10,19 @@ Nexus_FILES = Nexus.mm \
     LPGL/LPVector2.mm \
     LPGL/LPVector3.mm \
     LPGL/LPMatrix4.mm \
-    LPGL/LPGLViewController.mm 
+    LPGL/LPGLViewController.mm \
+    common/LPColorWheel.m \
+    common/ColorPicker/InfColorBarPicker.m \
+    common/ColorPicker/InfColorIndicatorView.m \
+    common/ColorPicker/InfColorPickerController.m \
+    common/ColorPicker/InfColorSquarePicker.m \
+    common/ColorPicker/InfHSBSupport.m \
+    common/ColorPicker/InfSourceColorView.m 
+
 
 Nexus_INSTALL_PATH = /Library/LivePapers/Plugins
 Nexus_FRAMEWORKS = UIKit CoreGraphics OpenGLES GLKit
+Nexus_OBJCFLAGS = -DPH_APP_TARGET=Nexus -I../common
 
 after-stage::
 	- find $(THEOS_STAGING_DIR) -iname '*.plist' -or -iname '*.strings' -exec plutil -convert binary1 {} \;

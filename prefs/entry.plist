@@ -1,0 +1,10 @@
+{
+    entry = {
+	bundle = LivePapers;
+	cell = PSLinkCell;
+	detail = LPListController;
+	icon = icon.png;
+	isController = 1;
+	label = LivePapers;
+    };
+}

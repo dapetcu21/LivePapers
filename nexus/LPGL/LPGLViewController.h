@@ -24,6 +24,7 @@
 -(void)update;
 -(void)render;
 -(void)reshape;
+-(void)reloadPreferences; //don't forget to call the supermethod
 
 -(GLKTextureInfo*)textureNamed:(NSString*)name;
 -(GLKTextureInfo*)textureFromFile:(NSString*)file;

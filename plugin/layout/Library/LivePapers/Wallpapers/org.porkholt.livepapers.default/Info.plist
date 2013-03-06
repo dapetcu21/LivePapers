@@ -8,5 +8,7 @@
 	<string>Default</string>
 	<key>Plugin</key>
 	<string>LPBuiltins</string>
+    <key>Has Settings</key>
+    <true/>
 </dict>
 </plist>

@@ -105,6 +105,7 @@
 
 -(void)reloadPreferences
 {
+    [super reloadPreferences];
     [self setCurrentContext];
     
     NSDictionary * prefs = [NSDictionary dictionaryWithContentsOfFile:NXPrefsPath];
@@ -117,6 +118,30 @@
     getparam(NXVelocityKey,   float, velocity, 0.4f);
     getparam(NXZToleranceKey, float, zTolerance, 0.5f);
     getparam(NXCountKey,      int, count, 10);
+    
+    particle_colors[0] = 0xff9f00;
+    particle_colors[1] = 0xff0000;
+    particle_colors[2] = 0x00ff00;
+    particle_colors[3] = 0x0000ff;
+    
+    uint8_t vv[12];
+    NSArray * a = [prefs objectForKey:NXColorsKey];
+    if (!a || ![a isKindOfClass:[NSArray class]])
+        goto error;
+    for (int i = 0; i < 12; i++)
+    {
+        NSNumber * nr = (NSNumber*)[a objectAtIndex:i];
+        if (!nr || ![nr isKindOfClass:[NSNumber class]])
+            goto error;
+        vv[i] = roundf(nr.floatValue * 255);
+    }
+    
+    particle_colors[0] = (vv[0] << 16) | (vv[1] << 8) | (vv[2]);
+    particle_colors[1] = (vv[3] << 16) | (vv[4] << 8) | (vv[5]);
+    particle_colors[2] = (vv[6] << 16) | (vv[7] << 8) | (vv[8]);
+    particle_colors[3] = (vv[9] << 16) | (vv[10] << 8)| (vv[11]);
+    
+    error:
 
     [self updateTexture];
 }
@@ -266,17 +291,10 @@ inline float randf()
 
 #define randfw() ((randf() - 0.5f) * 2.0f)
 
-static const uint32_t particle_colors[] = {
-    0xff9f00,
-    0xff0000,
-    0x00ff00,
-    0x0000ff,
-};
-
 void generateParticle(NexusViewController * self, particle * p)
 {
     p->type = rand() & 3;
-    p->color = (particle_colors[rand() % (sizeof(particle_colors)/sizeof(uint32_t))] << 8) | 0x80;
+    p->color = (self->particle_colors[rand() & 3] << 8) | 0x80;
 
     static const LPVector2 a[] = {
         LPVector2( 0, -1),

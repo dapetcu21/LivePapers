@@ -13,6 +13,10 @@
 #define LCDefaultPaper @"org.porkholt.livepapers.default"
 #define LCPrefsHomeKey @"HomeWallpaper"
 #define LCPrefsLockKey @"LockWallpaper"
+#define LCPrefsInterHome @"InteractionHome"
+#define LCPrefsInterLock @"InteractionLock"
+#define LCPrefsOverlayAlpha @"AltImageAlpha"
+#define LCPrefsIdleTimeout @"IdleTimeout"
 #define LCCenterUDReloadItems @"ReloadItems"
 #define LCCenterUDPrefsItems @"PrefsItems"
 #define LCCenterName @"org.porkholt.livepapers.center"
@@ -27,6 +31,7 @@
 #define LCBuiltinPrefsSolidColorDefaultRed   0.203f
 #define LCBuiltinPrefsSolidColorDefaultGreen 0.325f
 #define LCBuiltinPrefsSolidColorDefaultBlue  0.533f
+#define LCBuiltinPrefsGradientAlpha @"LCGradientAlpha"
 
 #define LCInitName @"LCInitName"
 #define LCInitBundleID @"LCInitBundleID"

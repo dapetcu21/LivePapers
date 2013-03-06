@@ -6,6 +6,7 @@ LPBuiltins_FRAMEWORKS = UIKit CoreGraphics
 LPBuiltins_OBJCFLAGS = -I../common 
 LPBuiltins_FILES = LPBuiltins.m \
                    LPDefaultViewController.m \
+                   LPDefaultPrefsController.m \
                    LPSolidViewController.m \
                    LPSolidPrefsController.m \
 

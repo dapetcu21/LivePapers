@@ -6,6 +6,11 @@
 #import "LPPreviewView.h"
 #import <AppSupport/CPDistributedMessagingCenter.h>
 
+__attribute__((visibility("default")))
+float LPGetIdleTimeout()
+{
+    return 10000000;
+}
 
 @implementation LPRootViewController
 - (void)loadView {
@@ -248,11 +253,14 @@
 
 -(void)saveSettings:(NSString*)s
 {
-    NSDictionary * sett = [NSDictionary dictionaryWithObjectsAndKeys:
-        homePaper, LCPrefsHomeKey,
-        lockPaper, LCPrefsLockKey,
-        nil];
+    NSMutableDictionary * sett = [[NSMutableDictionary alloc] initWithContentsOfFile:LCPrefsPath];
+    if (!sett)
+        sett = [[NSMutableDictionary alloc] init];
+    [sett setObject:homePaper forKey:LCPrefsHomeKey];
+    [sett setObject:lockPaper forKey:LCPrefsLockKey];
     [sett writeToFile: LCPrefsPath atomically:YES];
+    [sett release];
+    
     NSDictionary * ud = nil;
     if (s)
         ud = [NSDictionary dictionaryWithObjectsAndKeys:
@@ -343,7 +351,7 @@
 - (void)armTimer
 {
     if (preview.fullScreen) return;
-    timer = [NSTimer scheduledTimerWithTimeInterval:1.0f 
+    timer = [NSTimer scheduledTimerWithTimeInterval:0.3f 
                                              target:self
                                            selector:@selector(timerFired)
                                            userInfo:nil

@@ -9,6 +9,7 @@
     BOOL screenLit, viewShowing;
     int currentVariant;
     BOOL screenshotShowing;
+    BOOL interactive;
     BOOL active[2];
 
 #ifdef __cplusplus
@@ -24,6 +25,7 @@
 @property(nonatomic,assign) BOOL screenshotShowing;
 @property(nonatomic,assign) int currentVariant;
 @property(nonatomic,retain) UIEvent * savedEvent;
+@property(nonatomic,assign) BOOL interactive;
 
 -(void)setActive:(BOOL)a forVariant:(int)var;
 

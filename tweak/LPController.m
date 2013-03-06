@@ -8,8 +8,19 @@
 #import <SpringBoard/SBWallpaperView.h>
 #import <AppSupport/CPDistributedMessagingCenter.h>
 
+__attribute__((visibility("default")))
+float LPGetIdleTimeout()
+{
+    return [LPController sharedInstance].idleTimeout;
+}
+
 @implementation LPController
 @synthesize view;
+@synthesize idleTimeout;
+@synthesize overlayAlpha;
+@synthesize interactionHome;
+@synthesize interactionLock;
+@synthesize initializingFolders;
 
 static LPController * LPControllerSharedInstance = nil;
 
@@ -52,8 +63,8 @@ static LPController * LPControllerSharedInstance = nil;
 
 -(void)reloadSettingsWithMessage:(NSString*)message userData:(NSDictionary*)userData 
 {
-    bool loadHome = true;
-    bool loadLock = true;
+    BOOL loadHome = true;
+    BOOL loadLock = true;
     if (userData && [userData isKindOfClass:[NSDictionary class]])
     {
         NSString * s = (NSString*)[userData objectForKey:LCCenterUDReloadItems];
@@ -64,17 +75,51 @@ static LPController * LPControllerSharedInstance = nil;
     }
 
     NSDictionary * prefs = [NSDictionary dictionaryWithContentsOfFile:LCPrefsPath];
+    NSNumber * nr;
+    
+    nr = (NSNumber*)[prefs objectForKey:LCPrefsInterHome];
+    if (nr && [nr isKindOfClass:[NSNumber class]])
+        self.interactionHome = nr.boolValue;
+    else
+        self.interactionHome = YES;
+
+    nr = (NSNumber*)[prefs objectForKey:LCPrefsInterLock];
+    if (nr && [nr isKindOfClass:[NSNumber class]])
+        self.interactionLock = nr.boolValue;
+    else
+        self.interactionLock = YES;
+
+    nr = (NSNumber*)[prefs objectForKey:LCPrefsOverlayAlpha];
+    if (nr && [nr isKindOfClass:[NSNumber class]])
+        self.overlayAlpha = nr.floatValue;
+    else
+        self.overlayAlpha = 1.0f;
+    
+    nr = (NSNumber*)[prefs objectForKey:LCPrefsIdleTimeout];
+    if (nr && [nr isKindOfClass:[NSNumber class]])
+        self.idleTimeout = nr.floatValue;
+    else
+        self.idleTimeout = 40.0f;
+
+    
     NSString * home = loadHome ? (NSString*)[prefs objectForKey:LCPrefsHomeKey]  : nil;
     NSString * lock = loadLock ? (NSString*)[prefs objectForKey:LCPrefsLockKey] : nil;
     if (loadHome && (!home || ![home isKindOfClass:[NSString class]]))
         home = LCDefaultPaper;
     if (loadLock && (!lock || ![lock isKindOfClass:[NSString class]]))
         lock = LCDefaultPaper;
+    
 
     if (home)
         [self setWallpaper:[self wallpaperNamed:home] forVariant:LPHomeScreenVariant];
     if (lock)
         [self setWallpaper:[self wallpaperNamed:lock] forVariant:LPLockScreenVariant];
+    
+    LPWallpaper * wallHome = [self wallpaperForVariant:LPHomeScreenVariant];
+    LPWallpaper * wallLock = [self wallpaperForVariant:LPLockScreenVariant];
+    [wallHome reloadPreferences];
+    if (wallHome != wallLock)
+        [wallLock reloadPreferences];
 }
 
 -(void)reloadPreferencesWithMessage:(NSString*)message userData:(NSDictionary*)userData 
@@ -93,8 +138,6 @@ static LPController * LPControllerSharedInstance = nil;
 
     [wall reloadPreferences];
 }
-
-
 
 -(void)reloadSettings
 {
@@ -185,10 +228,23 @@ static LPController * LPControllerSharedInstance = nil;
     currentVariant = var;
     walls[0].viewController.currentVariant = currentVariant;
     walls[1].viewController.currentVariant = currentVariant;
+    walls[currentVariant].viewController.interactive = currentVariant ? interactionHome : interactionLock;
     if (currentVariant == 1 && view)
         view.wallpaper = walls[1];
     if (currentVariant == 0 && lockView)
         lockView.wallpaper = walls[0];
+}
+
+-(void)setInteractionHome:(BOOL)v
+{
+    interactionHome = v;
+    walls[1].viewController.interactive = v;
+}
+
+-(void)setInteractionLock:(BOOL)v
+{
+    interactionLock = v;
+    walls[0].viewController.interactive = v;
 }
 
 -(int)currentVariant

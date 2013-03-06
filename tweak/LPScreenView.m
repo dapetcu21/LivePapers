@@ -1,5 +1,6 @@
 #import "LPScreenView.h"
 #import "LPView.h"
+#import "LPController.h"
 #include <dlfcn.h>
 
 @implementation LPScreenView
@@ -9,18 +10,32 @@
     if ((self = [super initWithFrame:[[UIScreen mainScreen] bounds]]))
     {
         master = v;
+        retainsMaster = [LPController sharedInstance].initializingFolders;
         [master retain];
-        [master addScreenView];
     }
     return self;
 }
 
 -(void)dealloc
 {
-    [master removeScreenView];
+    if (retainedMaster)
+        [master removeScreenView];
     [master release];
     [super dealloc];
 }
+
+- (void)willMoveToWindow:(UIWindow *)window
+{
+    if (!retainsMaster) return;
+    BOOL b = window != 0;
+    if (b == retainedMaster) return;
+    retainedMaster = b;
+    if (b)
+        [master addScreenView];
+    else
+        [master removeScreenView];
+}
+
 
 -(void)drawRect:(CGRect)rect
 {

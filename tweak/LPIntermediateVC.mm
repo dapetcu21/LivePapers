@@ -120,6 +120,7 @@
 
 -(void)setScreenLit:(BOOL)v
 {
+    //NSLog(@"setScreenLit: %d", v);
     if (v!=screenLit)
     {
         BOOL om = getMask();
@@ -140,6 +141,7 @@
 
 -(void)setCurrentVariant:(int)var
 {
+    //NSLog(@"setCurrentVariant: %d", var);
     if (var!=currentVariant)
     {
         BOOL om = getMask();
@@ -150,6 +152,7 @@
 
 -(void)setActive:(BOOL)a forVariant:(int)var
 {
+    //NSLog(@"setActive: %d forVariant: %d",a, var);
     if (active[var] == a) return;
     BOOL om = getMask();
     active[var] = a;
@@ -158,6 +161,7 @@
 
 -(void)setViewShowing:(BOOL)v
 {
+    //NSLog(@"setViewShowing: %d", v);
     if (v!=viewShowing)
     {
         BOOL om = getMask();
@@ -230,7 +234,7 @@
 
 -(void)relayEvent:(UIEvent*)evt
 {
-    if (!getMask()) return;
+    if (!getMask() || !interactive) return;
     UIView * v = ((LPContainerView*)self.view)->v;
     if (!v) return;
     
@@ -312,4 +316,15 @@
     [cancelled release];
 }
 
+-(BOOL)interactive
+{
+    return interactive;
+}
+
+-(void)setInteractive:(BOOL)i
+{
+    if (interactive && !i && getMask())
+        [self cancelAllCurrentTouches];
+    interactive = i;
+}
 @end

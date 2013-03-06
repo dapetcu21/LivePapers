@@ -14,5 +14,7 @@ xcuserdata
 
 /app/common
 /tweak/common
+/bubblespro/common
+/nexus/common
 
 .DS_Store

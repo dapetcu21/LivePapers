@@ -19,6 +19,8 @@ UIImage* (*LPGetGradient)(int) = NULL;
     gradient.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
     self.view = v;
     [v release];
+    
+    [self reloadPreferences];
 }
 
 -(void)dealloc
@@ -49,6 +51,12 @@ UIImage* (*LPGetGradient)(int) = NULL;
     gradient.frame = f;
     imageView.frame = f;
     imageView.bounds = r;
+}
+
+- (void)reloadPreferences
+{
+    LPDefaultLoadPrefs(&s);
+    gradient.alpha = s.gradientAlpha;
 }
 
 @end
