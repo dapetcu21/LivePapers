@@ -1,4 +1,5 @@
 #import "LPRootViewController.h"
+#import "LPNotifications.h"
 
 void LPDisplayLinkInit();
 
@@ -16,9 +17,10 @@ void LPDisplayLinkInit();
 #if !TARGET_IPHONE_SIMULATOR
 	LPDisplayLinkInit();
 #endif
+    LPListenForNotifications();
 	_window = [[UIWindow alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
 	_viewController = [[LPRootViewController alloc] init];
-	[_window addSubview:_viewController.view];
+    [_window setRootViewController:_viewController];
 	[_window makeKeyAndVisible];
 }
 

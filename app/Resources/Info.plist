@@ -1,6 +1,6 @@
 {
 	CFBundleExecutable = LivePapers;
-	CFBundleIdentifier = "org.porkholt.LivePapers";
+	CFBundleIdentifier = "org.porkholt.livepapers";
 	"CFBundleInfoDictionaryVersion" = "6.0";
 	CFBundlePackageType = APPL;
 	CFBundleIcons = {

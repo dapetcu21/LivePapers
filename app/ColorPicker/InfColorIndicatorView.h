@@ -1,6 +1,6 @@
 //==============================================================================
 //
-//  InfSourceColorView.h
+//  InfColorIndicatorView.h
 //  InfColorPicker
 //
 //  Created by Troy Gaul on 8/10/10.
@@ -10,14 +10,13 @@
 //
 //==============================================================================
 
-#import "LPClassGuard.h"
 #import <UIKit/UIKit.h>
 
 //------------------------------------------------------------------------------
 
-@interface InfSourceColorView : UIControl
+@interface InfColorIndicatorView : UIView
 
-@property( nonatomic ) BOOL trackingInside;
+@property( retain, nonatomic ) UIColor* color;
 
 @end
 

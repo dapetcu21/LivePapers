@@ -5,6 +5,7 @@
 #import "LPCommon.h"
 #import "LPPreviewView.h"
 #import <AppSupport/CPDistributedMessagingCenter.h>
+#import "LPColorWheel.h"
 
 __attribute__((visibility("default")))
 float LPGetIdleTimeout()
@@ -240,12 +241,12 @@ float LPGetIdleTimeout()
         }
     }
 
-    NSDictionary * sett = [NSDictionary dictionaryWithContentsOfFile: LCPrefsPath];
-    NSString * p = (NSString*)[sett objectForKey:LCPrefsHomeKey];
+    NSUserDefaults * defaults = [NSUserDefaults standardUserDefaults];
+    NSString * p = (NSString*)[defaults stringForKey:LCPrefsHomeKey];
     if (![p isKindOfClass:[NSString class]])
         p = LCDefaultPaper;
     homePaper = [p retain];
-    p = (NSString*)[sett objectForKey:LCPrefsLockKey];
+    p = (NSString*)[defaults stringForKey:LCPrefsLockKey];
     if (![p isKindOfClass:[NSString class]])
         p = LCDefaultPaper;
     lockPaper = [p retain];
@@ -253,13 +254,10 @@ float LPGetIdleTimeout()
 
 -(void)saveSettings:(NSString*)s
 {
-    NSMutableDictionary * sett = [[NSMutableDictionary alloc] initWithContentsOfFile:LCPrefsPath];
-    if (!sett)
-        sett = [[NSMutableDictionary alloc] init];
-    [sett setObject:homePaper forKey:LCPrefsHomeKey];
-    [sett setObject:lockPaper forKey:LCPrefsLockKey];
-    [sett writeToFile: LCPrefsPath atomically:YES];
-    [sett release];
+    NSUserDefaults * defaults = [NSUserDefaults standardUserDefaults];
+    [defaults setObject:homePaper forKey:LCPrefsHomeKey];
+    [defaults setObject:lockPaper forKey:LCPrefsLockKey];
+    [defaults synchronize];
     
     NSDictionary * ud = nil;
     if (s)
@@ -297,12 +295,13 @@ float LPGetIdleTimeout()
 - (void)loadImageForPaper:(LPPaper*)p
 {
     NSAutoreleasePool * pool = [NSAutoreleasePool new];
-    UIImage * img = [UIImage imageWithContentsOfFile: [NSString stringWithFormat:@"/%@/%@.png", LCIconCachePath, p.bundleID]];
+    UIImage * img = [UIImage imageWithContentsOfFile: [NSString stringWithFormat:@"%@/%@.png", LCIconCachePath, p.bundleID]];
     if (!img)
-        img = [UIImage imageWithContentsOfFile: [NSString stringWithFormat:@"/%@/%@/Default.png", LCWallpapersPath, p.bundleID]];
+        img = [UIImage imageWithContentsOfFile: [NSString stringWithFormat:@"%@/%@/Default.png", LCWallpapersPath, p.bundleID]];
     if (!img)
         img = defaultImage;
-    [self performSelectorOnMainThread:@selector(imageLoadedForPaper:) withObject:[NSArray arrayWithObjects: p, img, nil] waitUntilDone:NO];
+    //NSLog(@"here goes an image: %@ %@", p, img);
+    [self performSelectorOnMainThread:@selector(imageLoadedForPaper:) withObject:[[NSArray arrayWithObjects: p, img, nil] retain] waitUntilDone:YES];
     [pool drain];
 }
 
@@ -310,8 +309,10 @@ float LPGetIdleTimeout()
 {
     LPPaper * p = (LPPaper*)[a objectAtIndex:0];
     UIImage * img = (UIImage*)[a objectAtIndex:1];
+    //NSLog(@"Here went an image: %@ %@", p, img);
     p.image = img;
     [flowView setImage:img forIndex:p.index];
+    [a release];
 }
 
 - (void)openFlowViewScrollingDidBegin:(AFOpenFlowView *)openFlowView
@@ -343,7 +344,7 @@ float LPGetIdleTimeout()
             [self timerFired];
             [preview toggleFullScreen];
         } else {
-            [[UIApplication sharedApplication] openURL:[NSURL URLWithString: @"cydia://search/LivePapers"]];
+            [[UIApplication sharedApplication] openURL:[NSURL URLWithString: LCCydiaURL]];
         }
     }
 }
@@ -386,6 +387,27 @@ float LPGetIdleTimeout()
         preview.hidden = NO;
     }
 }
+
+
+- (LPColorWheel*)newColorWheel
+{
+    return [[LPColorWheel alloc] initWithRootViewController:self];
+}
+
+
+- (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation
+{
+    return (interfaceOrientation == UIInterfaceOrientationPortrait);
+}
+
+- (NSUInteger)supportedInterfaceOrientations
+{
+    if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad)
+        return UIInterfaceOrientationMaskPortrait | UIInterfaceOrientationMaskPortraitUpsideDown;
+    else
+        return UIInterfaceOrientationMaskPortrait;
+}
+
 
 - (void)dealloc {
     [self disarmTimer];

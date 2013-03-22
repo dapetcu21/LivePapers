@@ -7,6 +7,7 @@
 -(void)setWallpaperRect:(CGRect)r;
 -(void)reloadPreferences;
 -(UIImage*)screenShot;
+-(void)setVariant:(int)v;
 @end
 
 @interface LPContainerView : UIView
@@ -147,6 +148,8 @@
         BOOL om = getMask();
         currentVariant = var;
         [self updateWithOldMask: om];
+        if (vc && [vc respondsToSelector:@selector(setVariant:)])
+            [(LPIntermediateVC<LPViewController>*)vc setVariant:currentVariant];
     }
 }
 

@@ -5,6 +5,15 @@ OpenFlow_FILES = \
     OpenFlow/OpenFlow/AFItem.m \
     OpenFlow/OpenFlow/AFOpenFlowView.m
 
+ColorPicker_FILES = \
+	LPColorWheel.m \
+	ColorPicker/InfColorBarPicker.m \
+	ColorPicker/InfColorIndicatorView.m \
+	ColorPicker/InfColorPickerController.m \
+	ColorPicker/InfColorSquarePicker.m \
+	ColorPicker/InfHSBSupport.m \
+	ColorPicker/InfSourceColorView.m 
+
 LivePapers_FILES = main.m \
     LivePapersApplication.m \
     LPRootViewController.m \
@@ -13,8 +22,10 @@ LivePapers_FILES = main.m \
     LPPreview.m \
     LPPaper.m \
     LPPlugin.m \
+    LPNotifications.m \
     TPPropertyAnimation.m \
-	$(OpenFlow_FILES)
+	$(OpenFlow_FILES) \
+	$(ColorPicker_FILES)
 
 ifneq ($(TARGET), simulator)
     LivePapers_FILES += ../common/LPDisplayLink.mm 

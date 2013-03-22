@@ -10,6 +10,7 @@
 #endif
 
 #define LCPrefsPath @LCVarMobile "Library/Preferences/org.porkholt.livepapers.plist"
+#define LCCydiaURL @"cydia://search/LivePapers"
 #define LCDefaultPaper @"org.porkholt.livepapers.default"
 #define LCPrefsHomeKey @"HomeWallpaper"
 #define LCPrefsLockKey @"LockWallpaper"
@@ -17,6 +18,8 @@
 #define LCPrefsInterLock @"InteractionLock"
 #define LCPrefsOverlayAlpha @"AltImageAlpha"
 #define LCPrefsIdleTimeout @"IdleTimeout"
+#define LCPrefsNotifLastUpdate @"NotifLastUpdate"
+#define LCPrefsNotifCount @"NotifCount"
 #define LCCenterUDReloadItems @"ReloadItems"
 #define LCCenterUDPrefsItems @"PrefsItems"
 #define LCCenterName @"org.porkholt.livepapers.center"

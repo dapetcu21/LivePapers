@@ -52,9 +52,10 @@
     {
         @try {
         NSData * data = UIImagePNGRepresentation(img);
+        [[NSFileManager defaultManager] createDirectoryAtPath:LCIconCachePath withIntermediateDirectories:YES attributes:nil error:nil];
         [data writeToFile:[LCIconCachePath stringByAppendingPathComponent:[NSString stringWithFormat:@"%@.png", self.bundleID]] atomically:NO];
         } @catch(id ex) {
-            NSLog(@"couldn't save thumbnail: %@", ex);
+            NSLog(@"Couldn't save thumbnail: %@", ex);
         }
     }
         

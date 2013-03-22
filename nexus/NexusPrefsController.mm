@@ -84,7 +84,8 @@
     float blockWidth = colorContainer.bounds.size.width / (4 + 3*colorFraction);
     for (int i = 0; i < 4; i++)
     {
-        LPColorWheel * w = [[LPColorWheel alloc] initWithFrame: CGRectMake(i * (blockWidth * (1 + colorFraction)), 0, blockWidth, colorHeight)];
+        LPColorWheel * w = [self.rootViewController newColorWheel];
+        w.frame = CGRectMake(i * (blockWidth * (1 + colorFraction)), 0, blockWidth, colorHeight);
         w.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleLeftMargin | UIViewAutoresizingFlexibleRightMargin;
         w.backgroundColor = [colors objectAtIndex:i];
         w.tag = i;

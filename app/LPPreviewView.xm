@@ -23,6 +23,7 @@ static LPPreviewView * catchTouch = nil;
 @protocol LPViewController
 -(void)setWallpaperImage:(UIImage*)img;
 -(void)setWallpaperRect:(CGRect)r;
+-(void)setVariant:(int)var;
 -(UIImage*)screenShot;
 @end
 
@@ -95,6 +96,10 @@ UIImage * SBWallpaperImageForVariant(int);
 
 - (void)setViewControllerParams
 {
+    UIViewController<LPViewController> * vc = (UIViewController<LPViewController>*)paper.preview.viewController;
+    if (vc && view && [vc respondsToSelector:@selector(setVariant:)])
+        [vc setVariant:1];
+
     [self setViewControllerImage];
     [self setViewControllerFrame:view.frame];
 }
@@ -114,6 +119,7 @@ UIImage * SBWallpaperImageForVariant(int);
     view.frame = self.bounds;
     view.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
     [self setViewControllerParams];
+    [self.paper.preview setHidden:self.hidden];
 }
 
 - (LPPaper*)paper
@@ -190,6 +196,12 @@ UIImage * SBWallpaperImageForVariant(int);
 {
     if (((UITouch*)[touches anyObject]).tapCount == 1)
         [self toggleFullScreen];
+}
+
+- (void)setHidden:(BOOL)hidden
+{
+    [super setHidden:hidden];
+    [self.paper.preview setHidden:hidden];
 }
 
 @end

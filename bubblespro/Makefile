@@ -5,13 +5,6 @@ include $(THEOS)/makefiles/common.mk
 LIBRARY_NAME = BubblesPro
 BubblesPro_FILES = BubblesPro.mm \
 				   BubblesPrefsController.mm \
-				   common/LPColorWheel.m \
-				   common/ColorPicker/InfColorBarPicker.m \
-				   common/ColorPicker/InfColorIndicatorView.m \
-				   common/ColorPicker/InfColorPickerController.m \
-				   common/ColorPicker/InfColorSquarePicker.m \
-				   common/ColorPicker/InfHSBSupport.m \
-				   common/ColorPicker/InfSourceColorView.m 
 
 BubblesPro_INSTALL_PATH = /Library/LivePapers/Plugins
 BubblesPro_FRAMEWORKS = UIKit CoreGraphics 

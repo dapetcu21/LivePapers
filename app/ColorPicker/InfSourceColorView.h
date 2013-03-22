@@ -1,33 +1,22 @@
 //==============================================================================
 //
-//  InfColorBarPicker.h
+//  InfSourceColorView.h
 //  InfColorPicker
 //
-//  Created by Troy Gaul on 8/9/10.
+//  Created by Troy Gaul on 8/10/10.
 //
 //  Copyright (c) 2011 InfinitApps LLC - http://infinitapps.com
 //	Some rights reserved: http://opensource.org/licenses/MIT
 //
 //==============================================================================
 
-#import "LPClassGuard.h"
 #import <UIKit/UIKit.h>
 
-@class InfColorIndicatorView;
-
 //------------------------------------------------------------------------------
 
-@interface InfColorBarView : UIView
+@interface InfSourceColorView : UIControl
 
-@end
-
-//------------------------------------------------------------------------------
-
-@interface InfColorBarPicker : UIControl {
-	InfColorIndicatorView* indicator;
-}
-
-@property( nonatomic ) float value;
+@property( nonatomic ) BOOL trackingInside;
 
 @end
 

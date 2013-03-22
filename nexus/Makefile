@@ -11,14 +11,6 @@ Nexus_FILES = Nexus.mm \
     LPGL/LPVector3.mm \
     LPGL/LPMatrix4.mm \
     LPGL/LPGLViewController.mm \
-    common/LPColorWheel.m \
-    common/ColorPicker/InfColorBarPicker.m \
-    common/ColorPicker/InfColorIndicatorView.m \
-    common/ColorPicker/InfColorPickerController.m \
-    common/ColorPicker/InfColorSquarePicker.m \
-    common/ColorPicker/InfHSBSupport.m \
-    common/ColorPicker/InfSourceColorView.m 
-
 
 Nexus_INSTALL_PATH = /Library/LivePapers/Plugins
 Nexus_FRAMEWORKS = UIKit CoreGraphics OpenGLES GLKit

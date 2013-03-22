@@ -1,5 +1,6 @@
 #import "BubblesCommon.h"
 #import "LPColorWheel.h"
+#import "LPRootController.h"
 
 @interface BubblesPrefsController : UIViewController<LPColorWheelDelegate>
 {
@@ -9,7 +10,7 @@
     UILabel * particleCountLabel, * particleLifetimeLabel, * particleSizeLabel, * velocityMagnitudeLabel, * particleAlphaLabel, * minimumDepthLabel, * maximumDepthLabel;
     UISegmentedControl * bgTypeSegmented, * swirlSegmented, * sharpEdgesSegmented;
 }
-@property(nonatomic, retain) UIViewController * rootViewController;
+@property(nonatomic, retain) UIViewController<LPRootController> * rootViewController;
 
 - (id)initWithDefaults:(BubblesSettings*)def;
 

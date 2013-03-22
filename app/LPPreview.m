@@ -74,4 +74,25 @@
     [super dealloc];
 }
 
+- (void)setHidden:(BOOL)h
+{
+    if (hidden != h)
+    {
+        hidden = h;
+        if (!hidden)
+        {
+            [viewController viewWillAppear:NO];
+            [viewController viewDidAppear:NO];
+        } else {
+            [viewController viewWillDisappear:NO];
+            [viewController viewDidDisappear:NO];
+        }
+    }
+}
+
+- (BOOL)isHidden
+{
+    return hidden;
+}
+
 @end

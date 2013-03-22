@@ -69,17 +69,9 @@ static void HSVFromUIColor( UIColor* color, float* h, float* s, float* v )
 #pragma mark	Class methods
 //------------------------------------------------------------------------------
 
-#ifdef PH_APP_TARGET
-#define STRINGIFY2(x) #x
-#define STRINGIFY(x) STRINGIFY2(x)
-#define NIB_NAME @"InfColorPickerView" STRINGIFY(PH_APP_TARGET)
-#else
-#define NIB_NAME @"InfColorPickerView"
-#endif
-
 + (InfColorPickerController*) colorPickerViewController
 {
-	return [ [ [ self alloc ] initWithNibName:NIB_NAME bundle: nil ] autorelease ];
+	return [ [ [ self alloc ] initWithNibName: @"InfColorPickerView" bundle: nil ] autorelease ];
 }
 
 //------------------------------------------------------------------------------

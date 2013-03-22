@@ -1,6 +1,7 @@
 #import "AFOpenFlowView.h"
 #import "AFOpenFlowViewDelegate.h"
 #import "AFOpenFlowViewDataSource.h"
+#import "LPRootController.h"
 
 @class LPPaper;
 @class LPPreviewView;

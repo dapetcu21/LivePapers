@@ -3,6 +3,7 @@
 
 @implementation LPColorWheel
 @synthesize delegate;
+@synthesize rootViewController = _rootViewController;
 
 - (id)initWithFrame:(CGRect)frame
 {
@@ -16,6 +17,21 @@
     }
     return self;
 }
+
+- (id)initWithRootViewController:(UIViewController*)vc
+{
+    if ((self = [super init]))
+    {
+        _rootViewController = vc;
+        CALayer * layer = self.layer;
+        layer.cornerRadius = 5.0;
+        layer.borderWidth = 2.0;
+        layer.borderColor = [UIColor whiteColor].CGColor;
+        layer.shadowOpacity = 0.5;
+    }
+    return self;
+}
+
 - (void)popoverControllerDidDismissPopover:(UIPopoverController *)popoverController
 {
     [popoverController release];
@@ -29,7 +45,8 @@
 
 - (void) colorPickerControllerDidFinish:(InfColorPickerController*) controller
 {
-    [self.delegate.rootViewController dismissModalViewControllerAnimated:YES];
+    if (_rootViewController)
+        [_rootViewController dismissModalViewControllerAnimated:YES];
 }
 
 - (void)touchesBegan:(NSSet *)touches withEvent:(UIEvent *)event
@@ -44,7 +61,8 @@
         [pov presentPopoverFromRect:self.bounds inView:self permittedArrowDirections:UIPopoverArrowDirectionAny animated:YES];
         [pov setPopoverContentSize:[InfColorPickerController idealSizeForViewInPopover]];
     } else {
-        [vc presentModallyOverViewController:[self.delegate rootViewController]];
+        if (_rootViewController)
+            [vc presentModallyOverViewController:_rootViewController];
     }
 }
 

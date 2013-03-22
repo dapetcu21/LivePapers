@@ -1,4 +1,5 @@
 #import "LPColorWheel.h"
+#import "LPRootController.h"
 
 @interface NexusPrefsController : UIViewController<LPColorWheelDelegate>
 {
@@ -10,11 +11,10 @@
     UISlider * countSlider, * lengthSlider, * widthSlider, * velocitySlider, * zToleranceSlider;
     
     NSMutableArray * colors;
-    UIViewController * rootViewController;
 }
 @property(nonatomic, retain) UIImage * image;
 @property(nonatomic, retain) NSMutableArray * colors;
-@property(nonatomic, retain) UIViewController * rootViewController;
+@property(nonatomic, retain) UIViewController<LPRootController> * rootViewController;
 
 - (void)loadPreferences;
 - (void)savePreferences;

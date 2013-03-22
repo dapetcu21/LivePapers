@@ -51,6 +51,7 @@
                                                   target:self.rootViewController
                                                  action:@selector(dismissPreferencesView)];
         barItem.rightBarButtonItem = button;
+        barItem.title = @"Bubbles";
         [button release];
         [bgView addSubview: bar];
         [barItem release];
@@ -120,7 +121,8 @@
 #define colorH 40.0
 #define addcolor(off, colorW, r, g, b, tg) \
     { \
-        LPColorWheel * vv = [[LPColorWheel alloc] initWithFrame: CGRectMake(f.size.width - off - colorW, currentHeight, colorW, colorH)]; \
+        LPColorWheel * vv = [self.rootViewController newColorWheel]; \
+        vv.frame = CGRectMake(f.size.width - off - colorW, currentHeight, colorW, colorH); \
         vv.backgroundColor = [UIColor colorWithRed:r green:g blue:b alpha:1.0]; \
         vv.autoresizingMask = UIViewAutoresizingFlexibleBottomMargin | UIViewAutoresizingFlexibleLeftMargin; \
         vv.tag = tg; \

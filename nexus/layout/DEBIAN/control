@@ -1,7 +1,7 @@
 Package: org.porkholt.livepapers.nexus
 Name: Nexus LivePaper
-Depends: org.porkholt.LivePapers
-Version: 1.0.0
+Depends: org.porkholt.LivePapers (>=1.1.0)
+Version: 1.1.0
 Architecture: iphoneos-arm
 Description: Configurable OpenGL Nexus live wallpaper
 Maintainer: Porkholt Labs! <support@porkholt.org>
