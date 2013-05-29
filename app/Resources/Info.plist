@@ -29,4 +29,11 @@
 	MinimumOSVersion = "3.0";
 	"UIApplicationExitsOnSuspend" = 1;
 	UIPrerenderedIcon = YES;
+	UISupportedInterfaceOrientations = (
+		UIInterfaceOrientationPortrait,
+	);
+	"UISupportedInterfaceOrientations~ipad" = (
+		UIInterfaceOrientationPortrait,
+		UIInterfaceOrientationPortraitUpsideDown,
+	);
 }

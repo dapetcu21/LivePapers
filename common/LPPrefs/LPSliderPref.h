@@ -1,7 +1,7 @@
 #import "LPPref.h"
 #import "LPClassGuard.h"
 
-#define prefSlider(_tag, _text, _format, _minimumValue, _maximumValue) { \
+#define prefSlider(_tag, _text, _format, _minimumValue, _maximumValue) do { \
     LPSliderPref * pref = [LPSliderPref new]; \
     pref.text = _text; \
     pref.format = _format; \
@@ -10,7 +10,7 @@
     pref.maximumValue = _maximumValue; \
     [self addPref:pref]; \
     [pref release]; \
-}
+} while(0)
 
 @interface LPSliderPref : LPPref
 {

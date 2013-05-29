@@ -1,12 +1,12 @@
 #import <UIKit/UIKit.h>
 #import "LPClassGuard.h"
 
-#define prefSpacer(_tag) { \
+#define prefSpacer(_tag) do { \
     LPPref * pref = [LPPref new]; \
     pref.tag = _tag; \
     [self addPref:pref]; \
     [pref release]; \
-}
+} while(0)
 #define prefSpacer_() prefSpacer(-1)
 
 @class LPPrefsViewController;

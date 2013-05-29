@@ -4,3 +4,4 @@
 #import "LPSliderPref.h"
 #import "LPSwitchPref.h"
 #import "LPColorPref.h"
+#import "LPButtonPref.h"

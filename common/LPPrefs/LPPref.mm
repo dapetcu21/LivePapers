@@ -10,7 +10,7 @@
 {
     if ((self = [super init]))
     {
-        view = [[UIView alloc] initWithFrame:CGRectMake(0, 0, 300.0f, 20.0f)];
+        view = [[UIView alloc] initWithFrame:CGRectMake(0, 0, 300.0f, 40.0f)];
         view.autoresizesSubviews = YES;
         view.autoresizingMask = UIViewAutoresizingFlexibleWidth;
     }
