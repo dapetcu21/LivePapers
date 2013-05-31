@@ -34,6 +34,26 @@
             <key>label</key>
             <string>Lock screen</string>
         </dict>
+        <dict>
+            <key>cell</key>
+            <string>PSGroupCell</string>
+            <key>label</key>
+            <string>Animation</string>
+            <key>footerText</key>
+            <string>Setting this to a big value, in conjunction with a long auto-lock timeout, might affect your battery life.</string>
+        </dict>
+        <dict>
+            <key>cell</key>
+            <string>PSSwitchCell</string>
+            <key>default</key>
+            <true/>
+            <key>defaults</key>
+            <string>org.porkholt.livepapers</string>
+            <key>key</key>
+            <string>PauseOnNC</string>
+            <key>label</key>
+            <string>Pause at Notif. Center</string>
+        </dict>
 <!--        <dict>
             <key>cell</key>
             <string>PSGroupCell</string>
@@ -56,12 +76,6 @@
         </dict> -->
         <dict>
             <key>cell</key>
-            <string>PSGroupCell</string>
-            <key>label</key>
-            <string>Idle animation timer</string>
-        </dict>
-        <dict>
-            <key>cell</key>
             <string>PSLinkListCell</string>
             <key>default</key>
             <real>40.0</real>
@@ -70,7 +84,7 @@
             <key>key</key>
             <string>IdleTimeout</string>
             <key>label</key>
-            <string>Timeout</string>
+            <string>Pause after</string>
             <key>detail</key>
             <string>PSListItemsController</string>
             <key>validTitles</key>
@@ -95,6 +109,38 @@
                 <real>300.0</real>
                 <real>1000000000.0</real>
             </array>
+        </dict>
+        <dict>
+            <key>cell</key>
+            <string>PSGroupCell</string>
+            <key>label</key>
+            <string>Appearance</string>
+            <key>footerText</key>
+            <string>This might help with performance if you find scrolling to the Spotlight page laggy.</string>
+        </dict>
+        <dict>
+            <key>cell</key>
+            <string>PSSwitchCell</string>
+            <key>default</key>
+            <false/>
+            <key>defaults</key>
+            <string>org.porkholt.livepapers</string>
+            <key>key</key>
+            <string>BlackCharging</string>
+            <key>label</key>
+            <string>Blackout while charging</string>
+        </dict>
+        <dict>
+            <key>cell</key>
+            <string>PSSwitchCell</string>
+            <key>default</key>
+            <false/>
+            <key>defaults</key>
+            <string>org.porkholt.livepapers</string>
+            <key>key</key>
+            <string>UndimSpotlight</string>
+            <key>label</key>
+            <string>Undim Spotlight</string>
         </dict>
         <dict>
             <key>cell</key>

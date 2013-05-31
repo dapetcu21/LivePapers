@@ -2,7 +2,7 @@
 using namespace std;
 
 @class LPDisplayLinkController;
-static map<id, LPDisplayLinkController*> controllers;
+static map<pair<id, NSRunLoop*>, LPDisplayLinkController*> controllers;
 static bool override = false;
 
 @interface CADisplayLink(_private)
@@ -13,6 +13,7 @@ static bool override = false;
 
 @interface LPDisplayLink : NSObject
 {
+    id _display;
 	NSInvocation * _invocation;
 	LPDisplayLinkController * _controller;
 	NSInteger _frameInterval, _currentFrame;
@@ -26,7 +27,7 @@ static bool override = false;
 @property(nonatomic, getter=isPaused) BOOL paused;
 @property(nonatomic, readonly) CFTimeInterval timestamp;
 
-- (id)initWithTarget:(id)target selector:(SEL)sel;
+- (id)initWithDisplay:(id)display target:(id)target selector:(SEL)sel;
 - (void)call;
 - (void)addToRunLoop:(NSRunLoop *)runloop forMode:(NSString *)mode;
 - (void)removeFromRunLoop:(NSRunLoop *)runloop forMode:(NSString *)mode;
@@ -44,15 +45,17 @@ static bool override = false;
 	int _linkCount;
 	BOOL _inside;
 	CADisplayLink * _displayLink;
+    NSRunLoop * _runLoop;
 }
 @property(nonatomic, readonly) CADisplayLink * displayLink;
 
-+ (LPDisplayLinkController*)linkControllerWithDisplay:(id)display;
++ (LPDisplayLinkController*)linkControllerWithDisplay:(id)display andRunLoop:(NSRunLoop*)runloop;
 - (void)addDisplayLink:(LPDisplayLink*)link;
 - (void)removeDisplayLink:(LPDisplayLink*)link;
-- (id)initWithDisplay:(id)display;
+- (id)initWithDisplay:(id)display andRunLoop:(NSRunLoop*)runloop;
 - (void)updatePaused;
 - (void)invalidate;
+- (void)addInRunLoopForMode:(NSString*)mode;
 @end
 
 //------------------------------------
@@ -60,14 +63,14 @@ static bool override = false;
 @implementation LPDisplayLinkController
 @synthesize displayLink = _displayLink;
 
-+ (LPDisplayLinkController*)linkControllerWithDisplay:(id)display
++ (LPDisplayLinkController*)linkControllerWithDisplay:(id)display andRunLoop:(NSRunLoop*)runloop
 {
-	map<id, LPDisplayLinkController*>::iterator i = controllers.find(display);
+	map<pair<id, NSRunLoop*>, LPDisplayLinkController*>::iterator i = controllers.find(make_pair(display, runloop));
 	LPDisplayLinkController * c;
 	if (i == controllers.end())
 	{
-		c = [[LPDisplayLinkController alloc] initWithDisplay:display];
-		controllers.insert(pair<id, LPDisplayLinkController*>(display, c));
+        c = [[LPDisplayLinkController alloc] initWithDisplay:display andRunLoop:runloop];
+		controllers.insert(make_pair(make_pair(display, runloop), c));
 	} else 
 		c = i->second;
 	return c;
@@ -93,7 +96,7 @@ static bool override = false;
 		[_links removeObject:link];
 		if (!--_linkCount)
 		{
-			controllers.erase(_display);
+			controllers.erase(make_pair(_display, _runLoop));
             [self invalidate];
 		} else {
 			[self updatePaused];
@@ -134,13 +137,14 @@ static bool override = false;
 	_displayLink.paused = paused;
 }
 
-- (id)initWithDisplay:(id)display
+- (id)initWithDisplay:(id)display andRunLoop:(NSRunLoop*)runloop
 {
 	if ((self = [super init]))
 	{
 		_links = [[NSMutableSet alloc] init];
 		_toRemove = [[NSMutableArray alloc] init];
 		_display = display;
+        _runLoop = [runloop retain];
 		override = true;
 		_displayLink = [CADisplayLink displayLinkWithDisplay:display target:self selector:@selector(trigger)];
         [_displayLink retain];
@@ -149,12 +153,19 @@ static bool override = false;
 	return self;
 }
 
+- (void)addInRunLoopForMode:(NSString*)mode
+{
+    [_displayLink addToRunLoop:_runLoop forMode:mode];
+}
+
 - (void)invalidate
 {
 	[_displayLink invalidate];
     [_displayLink release];
 	[_links release];
 	[_toRemove release];
+    [_runLoop release];
+    _runLoop = nil;
     _toRemove = nil;
     _links = nil;
     _displayLink = nil;
@@ -174,11 +185,12 @@ static bool override = false;
 @synthesize frameInterval = _frameInterval;
 @synthesize currentFrame = _currentFrame;
 
-- (id)initWithTarget:(id)target selector:(SEL)sel
+- (id)initWithDisplay:(id)display target:(id)target selector:(SEL)sel
 {
 	if ((self = [super init]))
 	{
         [target retain];
+        _display = display;
 		NSMethodSignature * sig = [target methodSignatureForSelector:sel];
 		_invocation = [[NSInvocation invocationWithMethodSignature:sig] retain];
 		[_invocation setTarget: target];
@@ -203,12 +215,18 @@ static bool override = false;
 
 - (void)addToRunLoop:(NSRunLoop *)runloop forMode:(NSString *)mode
 {
-	[_controller.displayLink addToRunLoop:runloop forMode:mode];
+    if (!_controller)
+    {
+        _controller = [LPDisplayLinkController linkControllerWithDisplay:_display andRunLoop:runloop];
+        [_controller addDisplayLink:self];
+    }
+	[_controller addInRunLoopForMode:mode];
 }
 
 - (void)removeFromRunLoop:(NSRunLoop *)runloop forMode:(NSString *)mode
 {
-	[_controller.displayLink removeFromRunLoop:runloop forMode:mode];
+    NSLog(@"WARNING: Porkholt: -[LPDisplayLink removeFromRunLoop] unimplemented");
+//	[_controller.displayLink removeFromRunLoop:runloop forMode:mode];
 }
 
 - (void)invalidate
@@ -250,14 +268,7 @@ static bool override = false;
 	if (override)
 		return %orig;
 	else
-	{
-		LPDisplayLinkController * c = [LPDisplayLinkController linkControllerWithDisplay:display]; 
-		LPDisplayLink * link = [[LPDisplayLink alloc] initWithTarget:target selector:sel];
-		link.controller = c;
-		[c addDisplayLink:link];
-		[link release];
-		return (CADisplayLink*)link;
-	}
+        return (CADisplayLink*)[[[LPDisplayLink alloc] initWithDisplay:display target:target selector:sel] autorelease];
 }
 
 %end

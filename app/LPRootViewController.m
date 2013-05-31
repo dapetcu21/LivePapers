@@ -110,7 +110,10 @@ float LPGetIdleTimeout()
     if (index < [papers count])
     {
         LPPaper * paper = (LPPaper*)[papers objectAtIndex:index];
-        NSString * s = [paper.bundleID retain];
+        NSString * s = paper.bundleID;
+        if ([s isEqual:homePaper])
+            s = LCDefaultPaper;
+        [s retain];
         [homePaper release];
         homePaper = s;
         [self selectedPaper:paper]; 
@@ -124,7 +127,10 @@ float LPGetIdleTimeout()
     if ((NSUInteger)index < [papers count])
     {
         LPPaper * paper = (LPPaper*)[papers objectAtIndex:index];
-        NSString * s = [paper.bundleID retain];
+        NSString * s = paper.bundleID;
+        if ([s isEqual:lockPaper])
+            s = LCDefaultPaper;
+        [s retain];
         [lockPaper release];
         lockPaper = s;
         [self selectedPaper:paper];

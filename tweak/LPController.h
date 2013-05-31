@@ -18,8 +18,13 @@
     float overlayAlpha;
     BOOL interactionHome;
     BOOL interactionLock;
+    BOOL pauseOnNC;
+    BOOL undimSpotlight;
+    BOOL blackCharging;
+    BOOL notificationCenterShowing;
     
     BOOL initializingFolders;
+
 }
 
 @property(nonatomic, assign) LPView * view;
@@ -31,6 +36,10 @@
 @property(nonatomic, assign) BOOL interactionHome;
 @property(nonatomic, assign) BOOL interactionLock;
 @property(nonatomic, assign) BOOL initializingFolders;
+@property(nonatomic, assign) BOOL notificationCenterShowing;
+@property(nonatomic, assign) BOOL pauseOnNC;
+@property(nonatomic, assign) BOOL undimSpotlight;
+@property(nonatomic, assign) BOOL blackCharging;
 
 
 +(LPController*)sharedInstance;

@@ -10,7 +10,12 @@
 -(id)specifiers
 {
 	if(_specifiers == nil) {
-        _specifiers = [[self loadSpecifiersFromPlistName:@"LivePapers" target:self] retain];
+        NSArray * specifiers = [self loadSpecifiersFromPlistName:@"LivePapers" target:self];
+        if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad)
+            specifiers = [specifiers filteredArrayUsingPredicate:[NSPredicate predicateWithBlock:^(PSSpecifier * obj, NSDictionary * bindings) {
+                return (BOOL)![obj.name isEqual:@"Blackout while charging"];
+            }]];
+        _specifiers = [specifiers retain];
 	}
 	return _specifiers;
 }

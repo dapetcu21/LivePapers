@@ -14,44 +14,18 @@
 #import "LPWallpaper.h"
 
 Class SpringBoard$;
+Class SBAwayController$;
 
 %hook SpringBoard 
 
 extern "C" void LPDisplayLinkInit();
 
+//Wake from idle detection
+
 static void resetIdle()
 {
     LPController * c = [LPController sharedInstance];
     [[c wallpaperForVariant:c.currentVariant].viewController resetIdleTimer];
-}
-
-static void setBacklight(BOOL b)
-{
-    static BOOL backlight = YES;
-    if (b != backlight)
-    {
-        LPController * c = [LPController sharedInstance];
-        [c wallpaperForVariant:0].viewController.screenLit = b;
-        [c wallpaperForVariant:1].viewController.screenLit = b;
-        backlight = b;
-        resetIdle();
-    }
-}
-
-static BOOL checkBacklightState()
-{
-    uint64_t state;
-    static int token = 0;
-    if(!token)
-        notify_register_check("com.apple.iokit.hid.displayStatus", &token);
-    notify_get_state(token, &state);
-    return state ? 1 : 0;
-}
-
-
-static void processBacklightState()
-{
-    setBacklight(checkBacklightState());
 }
 
 %group reset1
@@ -101,20 +75,38 @@ static void processBacklightState()
 
 %end
 
-@interface LPHomescreenView : LPView {}
-@end
-@implementation LPHomescreenView
-@end
-@interface LPLockscreenView : LPView {}
-@end
-@implementation LPLockscreenView 
+//Backlight hooks
 
-- (UIView *)hitTest:(CGPoint)point withEvent:(UIEvent *)event
+static void setBacklight(BOOL b)
 {
-    return self;
+    static BOOL backlight = YES;
+    if (b != backlight)
+    {
+        LPController * c = [LPController sharedInstance];
+        [c wallpaperForVariant:0].viewController.screenLit = b;
+        [c wallpaperForVariant:1].viewController.screenLit = b;
+        backlight = b;
+        resetIdle();
+    }
 }
 
-@end
+static BOOL checkBacklightState()
+{
+    uint64_t state;
+    static int token = 0;
+    if(!token)
+        notify_register_check("com.apple.iokit.hid.displayStatus", &token);
+    notify_get_state(token, &state);
+    return state ? 1 : 0;
+}
+
+
+static void processBacklightState()
+{
+    setBacklight(checkBacklightState());
+}
+
+//Actual view replacement
 
 %hook SBWallpaperView
 -(id)initWithOrientation:(int)orient variant:(int)var
@@ -143,19 +135,78 @@ static void processBacklightState()
 }
 %end
 
+//Notification center hooks
+
+%hook SBBulletinListController
+-(void)bulletinWindowDidResignKey
+{
+    [LPController sharedInstance].notificationCenterShowing = NO;
+    %orig;
+}
+-(void)bulletinWindowDidBecomeKey
+{
+    [LPController sharedInstance].notificationCenterShowing = YES;
+    %orig;
+}
+%end
+
+//Folder detection
+
 %hook SBFolderSlidingView
 -(id)initWithPosition:(int)position folderView:(id)view
 {
     LPController * c = [LPController sharedInstance];
-    c.initializingFolders = YES; 
+    c.initializingFolders = YES;
     id r = %orig;
     c.initializingFolders = NO;
     return r;
 }
 %end
 
+//Unfold
+
+%group unfold
+%hook UFView
+-(void)willMoveToWindow:(UIWindow *)window
+{
+    LPController * c = [LPController sharedInstance];
+    if (window)
+    {
+        c.currentVariant = 1;
+    } else {
+        SBAwayController * ac = [SBAwayController$ sharedAwayController];
+        if (ac.isLocked)
+            c.currentVariant = 0;
+    }
+    %log;
+}
+%end
+%end
+
+%hook SpringBoard
+-(void)applicationDidFinishLaunching:(id)app
+{
+    %orig;
+    if (objc_getClass("UFView"))
+        %init(unfold);
+}
+%end
+
+//Album art detection
+
+%hook SBAwayController
+-(void)handleRequestedAlbumArt:(id)art
+{
+    %log;
+    %orig;
+}
+%end
+
+//Constructor
+
 %ctor {
     SpringBoard$ = objc_getClass("SpringBoard");
+    SBAwayController$ = objc_getClass("SBAwayController");
 
     LPDisplayLinkInit();
     %init(); 

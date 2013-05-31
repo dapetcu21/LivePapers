@@ -22,9 +22,11 @@
     UIImage * image;
     UIImage * screen;
     UIImageView * shotView;
+    UIView * _blackView;
     CGRect imageRect;
     BOOL alreadyScreened;
     int screenViews;
+    UIView * _wallpaperView;
 }
 
 @property(nonatomic, assign) int orientation;
@@ -48,4 +50,11 @@
 -(void)removeScreenView;
 -(void)updateScreenView;
 
+-(BOOL)shouldInterpretAlphaAsOneMinusBlackness;
+-(void)updateBlacknessHidden;
+@end
+
+@interface LPHomescreenView : LPView {}
+@end
+@interface LPLockscreenView : LPView {}
 @end

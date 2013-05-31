@@ -21,6 +21,10 @@ float LPGetIdleTimeout()
 @synthesize interactionHome;
 @synthesize interactionLock;
 @synthesize initializingFolders;
+@synthesize notificationCenterShowing;
+@synthesize pauseOnNC;
+@synthesize undimSpotlight;
+@synthesize blackCharging;
 
 static LPController * LPControllerSharedInstance = nil;
 
@@ -88,6 +92,24 @@ static LPController * LPControllerSharedInstance = nil;
         self.interactionLock = nr.boolValue;
     else
         self.interactionLock = YES;
+
+    nr = (NSNumber*)[prefs objectForKey:LCPrefsPauseOnNC];
+    if (nr && [nr isKindOfClass:[NSNumber class]])
+        self.pauseOnNC = nr.boolValue;
+    else
+        self.pauseOnNC = YES;
+
+    nr = (NSNumber*)[prefs objectForKey:LCPrefsUndimSpotlight];
+    if (nr && [nr isKindOfClass:[NSNumber class]])
+        self.undimSpotlight = nr.boolValue;
+    else
+        self.undimSpotlight = NO;
+
+    nr = (NSNumber*)[prefs objectForKey:LCPrefsBlackCharging];
+    if (nr && [nr isKindOfClass:[NSNumber class]])
+        self.blackCharging = nr.boolValue;
+    else
+        self.blackCharging = NO;
 
     nr = (NSNumber*)[prefs objectForKey:LCPrefsOverlayAlpha];
     if (nr && [nr isKindOfClass:[NSNumber class]])
@@ -229,6 +251,7 @@ static LPController * LPControllerSharedInstance = nil;
     walls[0].viewController.currentVariant = currentVariant;
     walls[1].viewController.currentVariant = currentVariant;
     walls[currentVariant].viewController.interactive = currentVariant ? interactionHome : interactionLock;
+    [self setNotificationCenterShowing:notificationCenterShowing];
     if (currentVariant == 1 && view)
         view.wallpaper = walls[1];
     if (currentVariant == 0 && lockView)
@@ -245,6 +268,14 @@ static LPController * LPControllerSharedInstance = nil;
 {
     interactionLock = v;
     walls[0].viewController.interactive = v;
+}
+
+-(void)setNotificationCenterShowing:(BOOL)v
+{
+    notificationCenterShowing = v;
+    v = v && pauseOnNC;
+    walls[0].viewController.notificationCenterShowing = v;
+    walls[1].viewController.notificationCenterShowing = v;
 }
 
 -(int)currentVariant

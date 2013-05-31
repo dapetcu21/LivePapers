@@ -3,8 +3,14 @@
 #import "LPWallpaper.h"
 #import "LPController.h"
 #import "LPIntermediateVC.h"
+#import <SpringBoard/SBAwayController.h>
 
 #include <dlfcn.h>
+
+extern Class SBAwayController$;
+
+#define SCREENSHOT_TAG 12424
+#define IMAGE_TAG 7890
 
 UIImage * (*LPWallpaperImage)(int variant);
 BOOL (*LPWallpaperImageIsWallpaperImage)(UIImage * img);
@@ -45,7 +51,7 @@ CGRect (*LPWallpaperContentsRectForAspectFill)(CGSize, CGRect);
     CGRect b = self.bounds;
     if (vc)
         vc.view.frame = b;
-    [self viewWithTag:12424].frame = b;
+    [self viewWithTag:SCREENSHOT_TAG].frame = b;
     [self setWallImage: LPWallpaperImage(self.variant)];
     [self setWallRect: LPWallpaperContentsRectForAspectFill([image size], f)];
     orient = o;
@@ -72,7 +78,7 @@ CGRect (*LPWallpaperContentsRectForAspectFill)(CGSize, CGRect);
         if (!iv)
         {
             iv = [[[UIImageView alloc] initWithFrame:self.bounds] autorelease];
-            iv.tag = 7890;
+            iv.tag = IMAGE_TAG;
             iv.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
             iv.contentMode = UIViewContentModeTop;
             iv.opaque = NO;
@@ -81,7 +87,7 @@ CGRect (*LPWallpaperContentsRectForAspectFill)(CGSize, CGRect);
         iv.image = img;
         iv.alpha = [LPController sharedInstance].overlayAlpha;
     } else {
-        [[self viewWithTag:7890] removeFromSuperview];
+        [[self viewWithTag:IMAGE_TAG] removeFromSuperview];
     }
 }
 
@@ -176,7 +182,7 @@ CGRect (*LPWallpaperContentsRectForAspectFill)(CGSize, CGRect);
         UIImageView * iv = [[UIImageView alloc] initWithFrame:self.bounds];
         iv.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
         iv.image = [self screenshot];
-        iv.tag = 12424;
+        iv.tag = SCREENSHOT_TAG;
         [self addSubview:iv];
         [iv release];
     }
@@ -186,16 +192,20 @@ CGRect (*LPWallpaperContentsRectForAspectFill)(CGSize, CGRect);
     [_vc retain];
     [vc release];
     vc = _vc;
+    _wallpaperView = nil;
 
     if (vc)
     {
         UIView * v = vc.view;
+        _wallpaperView = v;
         [v setFrame:[self bounds]];
         [self addSubview:v];
         [[self viewWithTag:12424] removeFromSuperview];
         [self setWallImage: image];
         [self setWallRect:imageRect];
         [self updateScreenView];
+        [self updateBlacknessHidden];
+        [self bringSubviewToFront:_blackView];
     }
 }
 
@@ -243,6 +253,11 @@ CGRect (*LPWallpaperContentsRectForAspectFill)(CGSize, CGRect);
     vc.screenshotShowing = screenViews != 0;
 }
 
+-(void)updateBlacknessHidden
+{
+    vc.blackedOut = _blackView ? _blackView.alpha >= 1.0f : NO;
+}
+
 -(void)addScreenView
 {
     screenViews++;
@@ -264,4 +279,61 @@ CGRect (*LPWallpaperContentsRectForAspectFill)(CGSize, CGRect);
     }
 }
 
+-(void)setBlackness:(float)blackness
+{
+    if (!_blackView)
+    {
+        _blackView = [[UIView alloc] initWithFrame:self.bounds];
+        _blackView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
+        _blackView.backgroundColor = [UIColor blackColor];
+        [self addSubview:_blackView];
+        [_blackView release];
+    }
+    _blackView.alpha = blackness;
+    vc.blackedOut = blackness >= 1.0f;
+}
+
+-(float)blackness
+{
+    if (!_blackView)
+        return 0.0f;
+    return _blackView.alpha;
+}
+
+-(void)setAlpha:(CGFloat)a
+{
+    [self setBlackness:[self shouldInterpretAlphaAsOneMinusBlackness] ? 1.0f - a : 0.0f];
+}
+
+-(CGFloat)alpha
+{
+    return 1.0f - [self blackness];
+}
+
+-(BOOL)shouldInterpretAlphaAsOneMinusBlackness
+{
+    return NO;
+}
+
+@end
+
+@implementation LPHomescreenView
+-(BOOL)shouldInterpretAlphaAsOneMinusBlackness
+{
+    return ![LPController sharedInstance].undimSpotlight;
+}
+@end
+
+@implementation LPLockscreenView 
+-(BOOL)shouldInterpretAlphaAsOneMinusBlackness
+{
+    if ([LPController sharedInstance].blackCharging)
+        return YES;
+    return [(SBAwayController*)[SBAwayController$ sharedAwayControllerIfExists] activeAwayPluginController] != nil;
+}
+
+-(UIView *)hitTest:(CGPoint)point withEvent:(UIEvent *)event
+{
+    return self;
+}
 @end

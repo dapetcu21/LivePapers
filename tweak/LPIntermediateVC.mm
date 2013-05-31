@@ -112,71 +112,78 @@
     return screenshotShowing;
 }
 
-#define getMask() (screenLit && viewShowing && !screenshotShowing && active[currentVariant])
+-(BOOL)notificationCenterShowing
+{
+    return notifCenter;
+}
+
+-(BOOL)blackedOut
+{
+    return blackedOut;
+}
+
+-(void)setScreenLit:(BOOL)v
+{
+    if (v == screenLit) return;
+    screenLit = v;
+    [self updateMask];
+}
+
+-(void)setNotificationCenterShowing:(BOOL)v
+{
+    if (v == notifCenter) return;
+    notifCenter = v;
+    [self updateMask];
+}
+
+-(void)setScreenshotShowing:(BOOL)v
+{
+    if (v == screenshotShowing) return;
+    screenshotShowing = v;
+    [self updateMask];
+}
+
+-(void)setCurrentVariant:(int)var
+{
+    if (var == currentVariant) return;
+    currentVariant = var;
+    [self updateMask];
+    if (vc && [vc respondsToSelector:@selector(setVariant:)])
+        [(LPIntermediateVC<LPViewController>*)vc setVariant:currentVariant];
+}
+
+-(void)setActive:(BOOL)a forVariant:(int)var
+{
+    if (active[var] == a) return;
+    active[var] = a;
+    [self updateMask];
+}
+
+-(void)setViewShowing:(BOOL)v
+{
+    if (v == viewShowing) return;
+    viewShowing = v;
+    [self updateMask];
+}
+
+-(void)setBlackedOut:(BOOL)v
+{
+    if (v == blackedOut) return;
+    blackedOut = v;
+    [self updateMask];
+}
+
+#define getMask() (screenLit && !blackedOut && !notifCenter && viewShowing && !screenshotShowing && active[currentVariant])
 
 -(BOOL)showingOverall
 {
     return getMask();
 }
 
--(void)setScreenLit:(BOOL)v
-{
-    //NSLog(@"setScreenLit: %d", v);
-    if (v!=screenLit)
-    {
-        BOOL om = getMask();
-        screenLit = v;
-        [self updateWithOldMask: om];
-    }
-}
-
--(void)setScreenshotShowing:(BOOL)v
-{
-    if (v!=screenshotShowing)
-    {
-        BOOL om = getMask();
-        screenshotShowing = v;
-        [self updateWithOldMask: om];
-    }
-}
-
--(void)setCurrentVariant:(int)var
-{
-    //NSLog(@"setCurrentVariant: %d", var);
-    if (var!=currentVariant)
-    {
-        BOOL om = getMask();
-        currentVariant = var;
-        [self updateWithOldMask: om];
-        if (vc && [vc respondsToSelector:@selector(setVariant:)])
-            [(LPIntermediateVC<LPViewController>*)vc setVariant:currentVariant];
-    }
-}
-
--(void)setActive:(BOOL)a forVariant:(int)var
-{
-    //NSLog(@"setActive: %d forVariant: %d",a, var);
-    if (active[var] == a) return;
-    BOOL om = getMask();
-    active[var] = a;
-    [self updateWithOldMask: om];
-}
-
--(void)setViewShowing:(BOOL)v
-{
-    //NSLog(@"setViewShowing: %d", v);
-    if (v!=viewShowing)
-    {
-        BOOL om = getMask();
-        viewShowing = v;
-        [self updateWithOldMask: om];
-    }
-}
-
--(void)updateWithOldMask:(BOOL)m
+-(void)updateMask
 {
     BOOL mask = getMask();
-    if (mask == m) return;
+    if (mask == oldMask) return;
     if (mask)
     {
         [vc viewWillAppear:NO];
@@ -186,6 +193,7 @@
         [vc viewWillDisappear:NO];
         [vc viewDidDisappear:NO];
     }
+    oldMask = mask;
 }
 
 -(void)viewWillAppear:(BOOL)b

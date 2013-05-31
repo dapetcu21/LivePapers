@@ -10,7 +10,11 @@
     int currentVariant;
     BOOL screenshotShowing;
     BOOL interactive;
+    BOOL notifCenter;
+    BOOL blackedOut;
     BOOL active[2];
+
+    BOOL oldMask;
 
 #ifdef __cplusplus
     std::map<UITouch*, UITouch*> * touches;
@@ -26,11 +30,13 @@
 @property(nonatomic,assign) int currentVariant;
 @property(nonatomic,retain) UIEvent * savedEvent;
 @property(nonatomic,assign) BOOL interactive;
+@property(nonatomic,assign) BOOL notificationCenterShowing;
+@property(nonatomic,assign) BOOL blackedOut;
 
 -(void)setActive:(BOOL)a forVariant:(int)var;
 
 -(id)initWithViewController:(UIViewController*)vc;
--(void)updateWithOldMask:(BOOL)m;
+-(void)updateMask;
 
 -(void)setWallpaperImage:(UIImage*)img;
 -(void)setWallpaperRect:(CGRect)rect;
