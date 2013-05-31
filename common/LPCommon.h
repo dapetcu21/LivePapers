@@ -1,6 +1,9 @@
 #ifndef LPCOMMON_H
 #define LPCOMMON_H
 
+#import <UIKit/UIKit.h>
+#include <stdarg.h>
+
 #if TARGET_IPHONE_SIMULATOR
 #define LCVarMobile "/opt/theos/simroot/"
 #define LCRoot "/opt/theos/simroot/"
@@ -45,5 +48,19 @@
 #define LCInitWallpaperPath @"LCInitWallpaperPath"
 #define LCInitPluginPath @"LCInitPluginPath"
 #define LCInitIsPreview @"LCInitIsPreview"
+
+inline void LPAlertLog(NSString * format, ...)
+{
+    va_list args;
+    va_start(args, format);
+    NSString * s = [[NSString alloc] initWithFormat:format arguments:args]; 
+    va_end(args);
+    
+    UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"LivePapers" message:s delegate:nil cancelButtonTitle:@"Ok" otherButtonTitles:nil ];
+    [alert show];
+    [alert release];
+
+    [s release];
+}
 
 #endif

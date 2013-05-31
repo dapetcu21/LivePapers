@@ -1,6 +1,7 @@
 #import <Foundation/Foundation.h>
 #import <UIKit/UIKit.h>
 #import "LPController.h"
+#import "LPCommon.h"
 #import <SpringBoard/SpringBoard.h>
 #import <SpringBoard/SBWallpaperView.h>
 #import <SpringBoard/SBAwayController.h>
@@ -178,16 +179,6 @@ static void processBacklightState()
     %orig;
     if (objc_getClass("UFView"))
         %init(unfold);
-}
-%end
-
-//Album art detection
-
-%hook SBAwayController
--(void)handleRequestedAlbumArt:(id)art
-{
-    %log;
-    %orig;
 }
 %end
 
