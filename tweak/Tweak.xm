@@ -58,18 +58,7 @@ static void resetIdle()
         LPController * c = [LPController sharedInstance];
         [c relayEvent:evt];
         if ([(UITouch*)[[evt allTouches] anyObject] phase] == UITouchPhaseBegan)
-        {
-            BOOL doit = NO;
-            NSSet * set = [evt allTouches]; 
-            for (UITouch * e in set)
-                if (e.phase == UITouchPhaseBegan)
-                {
-                    doit = YES;
-                    break;
-                }
-            if (doit)
-                resetIdle();
-        }
+            resetIdle();
     }
 }
 
