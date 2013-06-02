@@ -1,4 +1,4 @@
-SUBPROJECTS = tweak plugin app prefs
+SUBPROJECTS = tweak plugin app prefs webkit
 
 export TARGET_IPHONEOS_DEPLOYMENT_VERSION = 4.3
 

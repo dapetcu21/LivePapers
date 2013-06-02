@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>Name</key>
+    <string>WebKit</string>
+	<key>Plugin</key>
+	<string>LPWebKit</string>
+    <key>Has Settings</key>
+    <true/>
+	<key>User Data</key>
+    <dict>
+        <key>URL</key>
+        <string>https://google.com</string>
+        <key>Configure URL</key>
+        <string>http://porkholt.org</string>
+    </dict>
+</dict>
+</plist>
