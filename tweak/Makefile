@@ -12,6 +12,7 @@ LivePapers_FILES = Tweak.xm \
                    LPWallpaper.m \
                    LPIntermediateVC.mm \
                    LPUITouch.mm \
+                   LPEventView.mm \
                    ../common/LPDisplayLink.mm \
 
 include $(THEOS_MAKE_PATH)/tweak.mk

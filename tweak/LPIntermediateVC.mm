@@ -1,6 +1,12 @@
 #import "LPIntermediateVC.h"
 #import "LPUITouch.h"
+#import "LPEventView.h"
 #import <UIKit/UIEvent2.h>
+#import <UIKit/UIInternalEvent.h>
+#import <UIKit/UITouchesEvent.h>
+#import <substrate.h>
+
+static Class UITouchesEvent$ = nil;
 
 @protocol LPViewController
 -(void)setWallpaperImage:(UIImage*)img;
@@ -10,41 +16,16 @@
 -(void)setVariant:(int)v;
 @end
 
-@interface LPContainerView : UIView
-{
-    @public
-        UIView * v;
-}
--(id)initWithView:(UIView*)v;
+@interface LPContainerEventView : LPEventView
 @end
 
-@implementation LPContainerView
--(id)initWithView:(UIView*)_v
-{
-    if ((self = [super init]))
-    {
-        v = _v;
-        self.userInteractionEnabled = YES;
-        [self addSubview:v];
-    }
-    return self;
-}
+@implementation LPContainerEventView
 -(void)setFrame:(CGRect)frame
 {
     [super setFrame:frame];
-    v.frame = self.bounds;
-}
--(void)touchesBegan:(NSSet*)touches withEvent:(UIEvent*)evt
-{
-}
--(void)touchesMoved:(NSSet*)touches withEvent:(UIEvent*)evt
-{
-}
--(void)touchesEnded:(NSSet*)touches withEvent:(UIEvent*)evt
-{
-}
--(void)touchesCancelled:(NSSet*)touches withEvent:(UIEvent*)evt
-{
+    CGRect b = self.bounds;
+    for (UIView * v in self.subviews)
+        v.frame = b;
 }
 @end
 
@@ -55,6 +36,8 @@
 {
     if ((self = [super init]))
     {
+        if (!UITouchesEvent$)
+            UITouchesEvent$ = objc_getClass("UITouchesEvent");
         vc = _vc;
         viewShowing = NO;
         screenLit = YES;
@@ -89,7 +72,11 @@
 
 -(void)loadView
 {
-    self.view = [[[LPContainerView alloc] initWithView:vc.view] autorelease];
+    LPEventView * eventView = [LPContainerEventView new];
+    //[eventView addSubview:vc.view];
+    eventView.rootViewController = vc;
+    self.view = eventView;
+    [eventView release];
 }
 
 -(BOOL)screenLit
@@ -245,27 +232,24 @@
 
 -(void)relayEvent:(UIEvent*)evt
 {
+    //return;
     if (!getMask() || !interactive) return;
-    UIView * v = ((LPContainerView*)self.view)->v;
-    if (!v) return;
     
     self.savedEvent = evt;
     
-    NSMutableSet * began = [NSMutableSet new];
-    NSMutableSet * moved = [NSMutableSet new];
-    NSMutableSet * ended = [NSMutableSet new];
-    NSMutableSet * cancelled = [NSMutableSet new];
+    NSMutableSet * allTouches = [NSMutableSet new];
     
     for (UITouch * touch in [evt allTouches])
     {
         UITouchPhase p = touch.phase;
         if (p == UITouchPhaseBegan)
         {
-            UITouch * t = [[UITouch alloc] initFromTouch:touch inView:v];
+            UITouch * t = [[UITouch alloc] initFromTouch:touch inView:self.view];
+            [t _setWindow:(UIWindow*)self.view];
             if (t)
             {
                 touches->insert(std::make_pair(touch, t));
-                [began addObject:t];
+                [allTouches addObject:t];
             }
         }
         else
@@ -276,44 +260,26 @@
                 [i->second syncWithTouch:touch];
                 switch(p)
                 {
-                    case UITouchPhaseMoved:
-                        [moved addObject:i->second];
-                        break;
                     case UITouchPhaseEnded:
-                        [ended addObject:i->second];
-                        [i->second release];
-                        touches->erase(i);
-                        break;
                     case UITouchPhaseCancelled:
-                        [cancelled addObject:i->second];
-                        [i->second release];
+                        [i->second autorelease];
                         touches->erase(i);
-                        break;
+                    case UITouchPhaseMoved:
+                        [allTouches addObject:i->second];
                 }
             }
         }
     }
     
-    if ([began count])
-        [v touchesBegan:began withEvent:evt];
-    if ([moved count])
-        [v touchesMoved:moved withEvent:evt];
-    if ([ended count])
-        [v touchesEnded:ended withEvent:evt];
-    if ([cancelled count])
-        [v touchesCancelled:cancelled withEvent:evt];
-    
-    [began release];
-    [moved release];
-    [ended release];
-    [cancelled release];
+    UIEvent * newEvt = [[UITouchesEvent$ alloc] _initWithEvent:[evt _gsEvent] touches:allTouches];
+    [newEvt _setTimestamp:evt.timestamp];
+    [(LPEventView*)self.view sendEvent:newEvt];
+    [newEvt release];
+    [allTouches release];
 }
 
 -(void)cancelAllCurrentTouches
 {
-    UIView * v = ((LPContainerView*)self.view)->v;
-    if (!v) return;
-    
     NSMutableSet * cancelled = [NSMutableSet new];
     for (std::map<UITouch*, UITouch*>::iterator i = touches->begin(); i != touches->end(); i++)
     {
@@ -322,7 +288,12 @@
         [i->second release];
     }
     if ([cancelled count])
-        [v touchesCancelled:cancelled withEvent:savedEvent];
+    {
+        UIEvent * newEvt = [[UITouchesEvent$ alloc] _initWithEvent:[savedEvent _gsEvent] touches:cancelled];
+        [newEvt _setTimestamp:savedEvent.timestamp];
+        [(LPEventView*)self.view sendEvent:newEvt];
+        [newEvt release];
+    }
     touches->clear();
     [cancelled release];
 }

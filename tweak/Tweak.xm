@@ -51,16 +51,17 @@ static void resetIdle()
     resetIdle(); 
 }
 
+//Event handling
+
 -(void)sendEvent:(UIEvent*)evt
 {
-    %orig;
     if (evt.type == UIEventTypeTouches)
     {
-        LPController * c = [LPController sharedInstance];
-        [c relayEvent:evt];
+        [[LPController sharedInstance] relayEvent:evt];
         if ([(UITouch*)[[evt allTouches] anyObject] phase] == UITouchPhaseBegan)
             resetIdle();
     }
+    %orig;
 }
 
 %end
