@@ -4,6 +4,23 @@
 
 @implementation UITouch (LPSynthesize)
 
+#define get(t,m) -(t)m { return MSHookIvar<t>(self, "_" #m ); }
+#define set_assign(t,m,mn) -(void)mn:(t)value { MSHookIvar<t>(self, "_" #m ) = value; }
+#define set_retain(t,m,mn) -(void)mn:(t)value { t & s = MSHookIvar<t>(self, "_" #m ); [value retain]; [s release]; s = value; }
+
+get(CGPoint, locationInWindow)
+set_assign(CGPoint, locationInWindow, setLocationInWindow)
+get(CGPoint, previousLocationInWindow)
+set_assign(CGPoint, previousLocationInWindow, setPreviousLocationInWindow)
+get(int, savedPhase)
+set_assign(int, savedPhase, setSavedPhase)
+get(id, pathIndex)
+set_retain(id, pathIndex, setPathIndex)
+get(id, pathIdentity)
+set_retain(id, pathIdentity, setPathIdentity)
+get(id, pathMajorRadius)
+set_retain(id, pathMajorRadius, setPathMajorRadius)
+
 -(id)initFromTouch:(UITouch*)touch inView:(UIView*)view
 {
     if ((self = [super init]))
@@ -25,11 +42,20 @@
 
 -(void)syncWithTouch:(UITouch*)touch
 {
-    UIView * v = self.view;
-    UIWindow * w = self.window;
-    [self _loadStateFromTouch:touch];
-    self.view = v;
-    self.window = w;
+    //UIView * v = self.view;
+    //UIWindow * w = self.window;
+    //[self _loadStateFromTouch:touch];
+    //self.view = v;
+    //self.window = w;
+    self.locationInWindow = touch.locationInWindow;
+    self.previousLocationInWindow = touch.previousLocationInWindow;
+    //self.pathIndex = touch.pathIndex;
+    //self.pathIdentity = touch.pathIdentity;
+    //self.pathMajorRadius = touch.pathMajorRadius;
+    self.timestamp = touch.timestamp;
+    self.phase = touch.phase;
+    self.savedPhase = touch.savedPhase;
+    self.tapCount = touch.tapCount;
 }
 
 -(void)changeToPhase:(UITouchPhase)phase

@@ -73,8 +73,11 @@ static Class UITouchesEvent$ = nil;
 -(void)loadView
 {
     LPEventView * eventView = [LPContainerEventView new];
-    //[eventView addSubview:vc.view];
+#ifdef LPEVENTVIEW_ISWINDOW
     eventView.rootViewController = vc;
+#else
+    [eventView addSubview:vc.view];
+#endif
     self.view = eventView;
     [eventView release];
 }
@@ -245,9 +248,11 @@ static Class UITouchesEvent$ = nil;
         if (p == UITouchPhaseBegan)
         {
             UITouch * t = [[UITouch alloc] initFromTouch:touch inView:self.view];
-            [t _setWindow:(UIWindow*)self.view];
             if (t)
             {
+#ifdef LPEVENTVIEW_ISWINDOW
+                [t _setWindow:(UIWindow*)self.view];
+#endif
                 touches->insert(std::make_pair(touch, t));
                 [allTouches addObject:t];
             }

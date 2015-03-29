@@ -31,5 +31,6 @@
 - (void)armTimer;
 - (void)disarmTimer;
 - (void)timerFired;
+- (void)loadImageForPaper:(LPPaper*)p;
 
 @end

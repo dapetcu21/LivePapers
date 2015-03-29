@@ -133,13 +133,19 @@ UIImage * SBWallpaperImageForVariant(int);
     if (h)
         self.hidden = NO;
         
-    UIImage * img;
+    UIImage * img = nil;
     UIViewController<LPViewController> * vc = (UIViewController<LPViewController>*)paper.preview.viewController;
-    if (vc && [vc respondsToSelector:@selector(screenShot)])
+    
+    if (vc && [vc respondsToSelector:@selector(screenShot)]) {
+        //Remove alpha channel
         img = [vc screenShot];
-    else {
+        UIGraphicsBeginImageContextWithOptions(img.size, true, img.scale);
+        [img drawInRect:CGRectMake(0.0f, 0.0f, img.size.width, img.size.height)];
+        img = UIGraphicsGetImageFromCurrentImageContext();
+        UIGraphicsEndImageContext();
+    } else {
         CGRect rect = [self bounds];
-        UIGraphicsBeginImageContextWithOptions(rect.size,self.opaque,0.0f);
+        UIGraphicsBeginImageContextWithOptions(rect.size, true, 0.0f);
         CGContextRef context = UIGraphicsGetCurrentContext();
         [self.layer renderInContext:context];   
         img = UIGraphicsGetImageFromCurrentImageContext();

@@ -86,6 +86,7 @@
 
 -(UIImage*)screenShot
 {
+    [EAGLContext setCurrentContext:_context];
     return ((GLKView*)self.view).snapshot;
 }
 

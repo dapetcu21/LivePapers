@@ -96,8 +96,8 @@ static bool override = false;
 		[_links removeObject:link];
 		if (!--_linkCount)
 		{
-			controllers.erase(make_pair(_display, _runLoop));
             [self invalidate];
+            [self release];
 		} else {
 			[self updatePaused];
 		}
@@ -120,9 +120,11 @@ static bool override = false;
 		l.currentFrame = c;
 	}
 	_inside = NO;
+    [self retain];
 	for (LPDisplayLink * l in _toRemove)
 		[self removeDisplayLink:l];
 	[_toRemove removeAllObjects];
+    [self release];
 }
 
 - (void)updatePaused
@@ -160,20 +162,20 @@ static bool override = false;
 
 - (void)invalidate
 {
+    controllers.erase(make_pair(_display, _runLoop));
 	[_displayLink invalidate];
     [_displayLink release];
+    _displayLink = nil;
+}
+
+- (void)dealloc
+{
 	[_links release];
 	[_toRemove release];
     [_runLoop release];
     _runLoop = nil;
     _toRemove = nil;
     _links = nil;
-    _displayLink = nil;
-}
-
-- (void)dealloc
-{
-    [self invalidate];
 	[super dealloc];
 }
 @end
@@ -272,6 +274,14 @@ static bool override = false;
 }
 
 %end
+
+//%hook EAGLContext
+//+(void)setCurrentContext:(EAGLContext*)context
+//{
+//    %log;
+//    %orig;
+//}
+//%end
 
 extern "C" void LPDisplayLinkInit()
 {

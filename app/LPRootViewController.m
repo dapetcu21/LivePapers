@@ -301,21 +301,21 @@ float LPGetIdleTimeout()
 - (void)loadImageForPaper:(LPPaper*)p
 {
     NSAutoreleasePool * pool = [NSAutoreleasePool new];
-    UIImage * img = [UIImage imageWithContentsOfFile: [NSString stringWithFormat:@"%@/%@.png", LCIconCachePath, p.bundleID]];
-    if (!img)
-        img = [UIImage imageWithContentsOfFile: [NSString stringWithFormat:@"%@/%@/Default.png", LCWallpapersPath, p.bundleID]];
-    if (!img)
-        img = defaultImage;
-    //NSLog(@"here goes an image: %@ %@", p, img);
-    [self performSelectorOnMainThread:@selector(imageLoadedForPaper:) withObject:[[NSArray arrayWithObjects: p, img, nil] retain] waitUntilDone:YES];
+    NSData * data = [NSData dataWithContentsOfFile:[NSString stringWithFormat:@"%@/%@.png", LCIconCachePath, p.bundleID]];
+    if (!data)
+        data = [NSData dataWithContentsOfFile: [NSString stringWithFormat:@"%@/%@/Default.png", LCWallpapersPath, p.bundleID]];
+    [self performSelectorOnMainThread:@selector(imageLoadedForPaper:) withObject:[[NSArray arrayWithObjects: p, data, nil] retain] waitUntilDone:YES];
     [pool drain];
 }
 
 - (void)imageLoadedForPaper:(NSArray*)a
 {
     LPPaper * p = (LPPaper*)[a objectAtIndex:0];
-    UIImage * img = (UIImage*)[a objectAtIndex:1];
-    //NSLog(@"Here went an image: %@ %@", p, img);
+    NSData * data = (NSData*)[a objectAtIndex:1];
+    UIImage * img = [UIImage imageWithData:data];
+    if (!img)
+        img = defaultImage;
+    NSLog(@"Here went an image: %@ %@ %d", p, img, p.index);
     p.image = img;
     [flowView setImage:img forIndex:p.index];
     [a release];
